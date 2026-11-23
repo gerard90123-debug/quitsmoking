@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>森呼吸 · 生命之树 — 戒烟养成</title>
+<style>
+  :root {
+    --bg: #f3f7f4;
+    --card: #ffffff;
+    --ink: #1b2b22;
+    --muted: #66786e;
+    --green: #2c7a52;
+    --green-soft: #e6f3ec;
+    --amber: #c87d20;
+    --amber-soft: #fdf3e4;
+    --danger: #c44536;
+    --danger-soft: #fbeae7;
+    --border: #e2ebe5;
+    --shadow: 0 8px 24px rgba(27, 43, 34, 0.06);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height: 1.5;
+  }
+  .app {
+    max-width: 440px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 16px 16px 88px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; font-weight: 700; }
+  h2 { font-size: 16px; margin: 0 0 10px; font-weight: 700; }
+  p.sub { margin: 0; font-size: 13px; color: var(--muted); }
+
+  /* Onboarding */
+  .field { margin: 16px 0; }
+  .field-head { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .field-val { color: var(--green); }
+  input[type="range"] { width: 100%; accent-color: var(--green); height: 6px; cursor: pointer; }
+  .preview-box {
+    background: #f8fbf9;
+    border: 1px dashed #c8dbd0;
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 14px 0 18px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-danger { background: var(--danger-soft); color: var(--danger); }
+  .badge-amber { background: var(--amber-soft); color: var(--amber); }
+  .badge-green { background: var(--green-soft); color: var(--green); }
+
+  button {
+    border: none;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.12s ease, opacity 0.2s ease, background 0.2s ease;
+  }
+  button:active:not(:disabled) { transform: scale(0.97); }
+  button:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-primary { width: 100%; background: var(--green); color: #fff; }
+  .btn-soft { background: var(--green-soft); color: var(--green); }
+  .btn-amber { background: var(--amber-soft); color: var(--amber); }
+  .btn-ghost { background: #f1f5f2; color: var(--ink); font-size: 12px; padding: 8px 10px; border-radius: 10px; }
+
+  /* Top stats */
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .stat-num { font-size: 18px; font-weight: 700; color: var(--green); }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* Tree stage */
+  .stage {
+    background: linear-gradient(180deg, #eef7f1 0%, #f9fcf9 72%, #e7f0e9 100%);
+    border-radius: 18px;
+    padding: 14px 12px 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .stage-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .tree-svg-wrap { width: 190px; height: 190px; margin: 4px auto 8px; cursor: pointer; }
+  .tree-svg-wrap.bounce svg { animation: bounceTree 0.45s ease; }
+  @keyframes bounceTree {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.06, 0.95); }
+    75% { transform: scale(0.98, 1.03); }
+    100% { transform: scale(1); }
+  }
+  .droplet-toast {
+    font-size: 12px;
+    color: var(--green);
+    min-height: 18px;
+    font-weight: 600;
+  }
+
+  /* Progress bar */
+  .progress-track {
+    width: 100%;
+    height: 10px;
+    background: #e5eee8;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 8px 0 6px;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #56ab7c, #2c7a52);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  /* Action row */
+  .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .action-btn { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 12px 10px; }
+  .quota-tag {
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.85);
+    color: var(--ink);
+  }
+  .sub-note { font-size: 11px; opacity: 0.85; font-weight: 500; }
+
+  /* Milestones */
+  .milestone-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #f8fbf9;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .milestone-item.done { background: var(--green-soft); }
+  .milestone-title { font-weight: 600; }
+  .milestone-desc { font-size: 11px; color: var(--muted); }
+
+  /* Forest */
+  .forest-scene {
+    background: linear-gradient(180deg, #e7f3fb 0%, #eef8f0 55%, #d9ebd9 100%);
+    border-radius: 18px;
+    padding: 16px;
+    min-height: 210px;
+    border: 1px solid #d5e6d9;
+  }
+  .forest-trees {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .forest-tree-card {
+    background: rgba(255,255,255,0.88);
+    border: 1px solid #d7e7dc;
+    border-radius: 14px;
+    padding: 10px;
+    width: 104px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  /* Breath modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(18, 28, 22, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal-card {
+    background: #fff;
+    border-radius: 22px;
+    padding: 22px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+  }
+  .breath-circle {
+    width: 124px;
+    height: 124px;
+    border-radius: 50%;
+    margin: 16px auto;
+    background: var(--green-soft);
+    border: 3px solid var(--green);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 4s ease-in-out, background 0.4s ease;
+  }
+  .breath-circle.expand { transform: scale(1.18); background: #d4ecdf; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 440px;
+    background: rgba(255,255,255,0.96);
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 8px 16px 12px;
+    gap: 10px;
+    z-index: 20;
+  }
+  .nav-btn { background: transparent; color: var(--muted); padding: 8px; border-radius: 12px; }
+  .nav-btn.active { background: var(--green-soft); color: var(--green); }
+  .disclaimer { font-size: 11px; color: var(--muted); text-align: center; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<div class="modal-backdrop" id="breathModal">
+  <div class="modal-card">
+    <h2 id="breathTitle">60 秒烟瘾深呼吸急救</h2>
+    <p class="sub" id="breathTip">吸气 4 秒 · 屏息 2 秒 · 呼气 4 秒，帮大脑渡过渴求波峰</p>
+    <div class="breath-circle" id="breathCircle">
+      <div id="breathPhase" style="font-weight:700;color:var(--green);font-size:15px;">准备</div>
+      <div id="breathSec" style="font-size:22px;font-weight:700;margin-top:2px;">60s</div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-ghost" style="flex:1;" onclick="closeBreathModal()">稍后再试</button>
+      <button class="btn-primary" style="flex:1;" id="breathActionBtn" onclick="toggleBreathTimer()">开始呼吸</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "breath_forest_state_v1";
+const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+const DAILY_WATER_LIMIT = 3;
+const FULL_RECOVERY_DAYS = 365;
+
+const SPECIES_LIST = [
+  { id: "camphor", name: "希望香樟", emoji: "🌿", leaf: "#388e5c", canopy: "#52ad76" },
+  { id: "birch", name: "雪域白桦", emoji: "🌳", leaf: "#469b67", canopy: "#72c28e" },
+  { id: "sakura", name: "治愈樱花树", emoji: "🌸", leaf: "#e07a9f", canopy: "#f3a6c2" },
+  { id: "ginkgo", name: "黄金银杏", emoji: "🍂", leaf: "#d99b26", canopy: "#f2be49" }
+];
+
+const MILESTONES = [
+  { days: 0.014, label: "20 分钟", title: "心率与血压开始回落", desc: "尼古丁刺激减弱，循环系统迈出第一步" },
+  { days: 0.5, label: "12 小时", title: "血液一氧化碳水平下降", desc: "血液携氧能力改善，头脑更清爽" },
+  { days: 2, label: "48 小时", title: "尼古丁代谢产物明显排出", desc: "味觉与嗅觉神经末梢开始恢复敏感" },
+  { days: 14, label: "2 周", title: "肺活量与循环明显改善", desc: "走路气喘减轻，肺功能开始稳步提升" },
+  { days: 90, label: "3 个月", title: "肺功能显著回升", desc: "呼吸更顺畅，咳嗽与胸闷感大幅减少" },
+  { days: 270, label: "9 个月", title: "气道纤毛逐步修复", desc: "肺部清洁能力增强，感染风险下降" },
+  { days: 365, label: "1 年（365天）", title: "达成年度 100% 满级树苗", desc: "心血管长期风险显著降低，可解锁下一株新树！" }
+];
+
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function defaultState() {
+  return {
+    onboarded: false,
+    yearsSmoked: 5,
+    cigsPerDay: 15,
+    quitStartAt: null,
+    lastCheckinDate: null,
+    streakDays: 0,
+    waterCountToday: 0,
+    waterDate: todayStr(),
+    lastWaterAt: 0,
+    bonusWater: 0,
+    currentSpeciesId: "camphor",
+    currentTreeStartAt: null,
+    forestTrees: [],
+    activeTab: "tree",
+    selectedForestTreeIdx: null
+  };
+}
+
+let state = loadState();
+let breathInterval = null;
+let breathRemaining = 60;
+let breathRunning = false;
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    return { ...defaultState(), ...JSON.parse(raw) };
+  } catch (e) {
+    return defaultState();
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {}
+}
+
+function syncDailyQuota() {
+  const today = todayStr();
+  if (state.waterDate !== today) {
+    state.waterDate = today;
+    state.waterCountToday = 0;
+    saveState();
+  }
+}
+
+function damageIndex() {
+  const packYears = (state.yearsSmoked * state.cigsPerDay) / 20;
+  return Math.min(100, Math.round(15 + packYears * 2.2));
+}
+
+function initialHealthStart() {
+  // 重度烟龄/烟量起始生命值更低（5%~35%），坚持 365 天后达到 100%
+  const dmg = damageIndex();
+  return Math.max(5, Math.min(35, Math.round(38 - dmg * 0.32)));
+}
+
+function elapsedDaysForTree() {
+  const base = state.currentTreeStartAt || state.quitStartAt || Date.now();
+  return Math.max(0, (Date.now() - base) / (1000 * 60 * 60 * 24));
+}
+
+function totalQuitDays() {
+  if (!state.quitStartAt) return 0;
+  return Math.max(0, (Date.now() - state.quitStartAt) / (1000 * 60 * 60 * 24));
+}
+
+function recoveryPercent() {
+  const days = elapsedDaysForTree();
+  const start = initialHealthStart();
+  const ratio = Math.min(1, days / FULL_RECOVERY_DAYS);
+  return Math.min(100, Math.round((start + (100 - start) * ratio) * 10) / 10);
+}
+
+function treeStageInfo(pct) {
+  if (pct < 20) return { stage: 1, name: "濒危枯苗", status: "奄奄一息 · 急需呵护", badgeClass: "badge-danger" };
+  if (pct < 45) return { stage: 2, name: "复苏嫩芽", status: "破土微绿 · 渐入佳境", badgeClass: "badge-amber" };
+  if (pct < 75) return { stage: 3, name: "茁壮小树", status: "枝叶舒展 · 呼吸顺畅", badgeClass: "badge-green" };
+  if (pct < 100) return { stage: 4, name: "繁茂花树", status: "绿意盎然 · 活力充沛", badgeClass: "badge-green" };
+  return { stage: 5, name: "参天生命树", status: "100% 满级 · 可迎新树", badgeClass: "badge-green" };
+}
+
+function renderTreeSVG(stage, speciesId, isPreview = false) {
+  const sp = SPECIES_LIST.find(s => s.id === speciesId) || SPECIES_LIST[0];
+  const trunkColor = stage === 1 ? "#7a6652" : "#6b4c35";
+  const leafColor = stage === 1 ? "#9c8b56" : sp.leaf;
+  const canopyColor = stage === 1 ? "#b09f68" : sp.canopy;
+
+  if (stage === 1 && !isPreview) {
+    return `
+      <svg viewBox="0 0 180 180" width="100%" height="100%">
+        <ellipse cx="90" cy="154" rx="54" ry="12" fill="#d9cbb8" />
+        <path d="M90 152 Q86 122 92 98 Q78 86 70 92" stroke="${trunkColor}" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <path d="M91 114 Q105 103 113 108" stroke="${trunkColor}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="68" cy="91" rx="8" ry="4" fill="${leafColor}" opacity="0.75"/>
+        <ellipse cx="114" cy="108" rx="7" ry="3.5" fill="${leafColor}" opacity="0.65"/>
+        <ellipse cx="93" cy="95" rx="6" ry="3" fill="${leafColor}" opacity="0.5"/>
+      </svg>
+    `;
+  }
+  if (stage === 1 && isPreview) {
+    return `
+      <svg viewBox="0 0 120 120" width="76" height="76">
+        <ellipse cx="60" cy="103" rx="36" ry="8" fill="#e2d6c5" />
+        <path d="M60 101 Q57 80 61 64 Q51 56 45 60" stroke="${trunkColor}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M60 76 Q71 68 77 72" stroke="${trunkColor}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="44" cy="60" rx="6" ry="3" fill="${leafColor}" opacity="0.7"/>
+      </svg>
+    `;
+  }
+  if (stage === 2) {
+    return `
+      <svg viewBox="0 0 180 180" width="100%" height="100%">
+        <ellipse cx="90" cy="154" rx="54" ry="12" fill="#cde3d3" />
+        <path d="M90 152 Q88 118 90 84" stroke="${trunkColor}" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <path d="M90 112 Q72 98 64 102" stroke="${trunkColor}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M90 104 Q108 90 116 94" stroke="${trunkColor}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <circle cx="90" cy="80" r="14" fill="${leafColor}" />
+        <circle cx="64" cy="100" r="10" fill="${canopyColor}" />
+        <circle cx="116" cy="92" r="10" fill="${canopyColor}" />
+      </svg>
+    `;
+  }
+  if (stage === 3) {
+    return `
+      <svg viewBox="0 0 180 180" width="100%" height="100%">
+        <ellipse cx="90" cy="156" rx="58" ry="12" fill="#c3dfc9" />
+        <path d="M90 154 L90 82" stroke="${trunkColor}" stroke-width="9" stroke-linecap="round"/>
+        <path d="M90 116 L64 94" stroke="${trunkColor}" stroke-width="5.5" stroke-linecap="round"/>
+        <path d="M90 108 L116 86" stroke="${trunkColor}" stroke-width="5.5" stroke-linecap="round"/>
+        <circle cx="90" cy="74" r="26" fill="${leafColor}" />
+        <circle cx="64" cy="90" r="20" fill="${canopyColor}" />
+        <circle cx="116" cy="84" r="20" fill="${canopyColor}" />
+        <circle cx="90" cy="58" r="18" fill="${canopyColor}" />
+      </svg>
+    `;
+  }
+  return `
+    <svg viewBox="0 0 180 180" width="100%" height="100%">
+      <ellipse cx="90" cy="158" rx="64" ry="12" fill="#b8d9bf" />
+      <path d="M90 156 L90 78" stroke="${trunkColor}" stroke-width="11" stroke-linecap="round"/>
+      <path d="M90 118 L58 90" stroke="${trunkColor}" stroke-width="6.5" stroke-linecap="round"/>
+      <path d="M90 108 L122 82" stroke="${trunkColor}" stroke-width="6.5" stroke-linecap="round"/>
+      <circle cx="90" cy="68" r="32" fill="${leafColor}" />
+      <circle cx="58" cy="86" r="24" fill="${canopyColor}" />
+      <circle cx="122" cy="80" r="24" fill="${canopyColor}" />
+      <circle cx="90" cy="46" r="22" fill="${canopyColor}" />
+      ${stage === 5 ? `
+        <circle cx="72" cy="58" r="4" fill="#fff7b2" />
+        <circle cx="110" cy="66" r="4" fill="#fff7b2" />
+        <circle cx="92" cy="36" r="4" fill="#fff7b2" />
+      ` : ""}
+    </svg>
+  `;
+}
+
+function getWaterCooldownRemainingMs() {
+  if (!state.lastWaterAt) return 0;
+  return Math.max(0, TWO_HOURS_MS - (Date.now() - state.lastWaterAt));
+}
+
+function formatDuration(ms) {
+  const totalSec = Math.ceil(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function completeOnboarding() {
+  const now = Date.now();
+  state.onboarded = true;
+  state.quitStartAt = now;
+  state.currentTreeStartAt = now;
+  state.lastCheckinDate = todayStr();
+  state.streakDays = 1;
+  state.waterDate = todayStr();
+  state.waterCountToday = 0;
+  state.lastWaterAt = 0;
+  state.bonusWater = 0;
+  state.activeTab = "tree";
+  saveState();
+  render();
+}
+
+function resetOnboarding() {
+  state = defaultState();
+  saveState();
+  render();
+}
+
+function handleCheckin() {
+  const today = todayStr();
+  if (state.lastCheckinDate === today) return;
+  state.lastCheckinDate = today;
+  state.streakDays = (state.streakDays || 0) + 1;
+  saveState();
+  render("今日无烟打卡成功！阳光已照耀生命之树。");
+}
+
+function handleWater() {
+  syncDailyQuota();
+  const cd = getWaterCooldownRemainingMs();
+  if (cd > 0) return;
+
+  if (state.waterCountToday < DAILY_WATER_LIMIT) {
+    state.waterCountToday += 1;
+    state.lastWaterAt = Date.now();
+    saveState();
+    render(`浇水成功！今日已浇水 ${state.waterCountToday}/${DAILY_WATER_LIMIT} 次，2 小时后可再次浇水。`);
+    return;
+  }
+
+  if (state.bonusWater > 0) {
+    state.bonusWater -= 1;
+    state.lastWaterAt = Date.now();
+    saveState();
+    render("使用了 1 次呼吸急救赠予的额外清泉，小树喝得超开心！");
+  }
+}
+
+function unlockNewTree(speciesId) {
+  const days = Math.max(1, Math.round(elapsedDaysForTree()));
+  const cigsAvoided = Math.round(days * state.cigsPerDay);
+  state.forestTrees.push({
+    speciesId,
+    days,
+    cigsAvoided,
+    completedAt: todayStr()
+  });
+  const nextIdx = (SPECIES_LIST.findIndex(s => s.id === speciesId) + 1) % SPECIES_LIST.length;
+  state.currentSpeciesId = SPECIES_LIST[nextIdx].id;
+  state.currentTreeStartAt = Date.now();
+  saveState();
+  render("恭喜！满级大树已收入生命森林，新一株小树苗已开启！");
+}
+
+function openBreathModal() {
+  breathRunning = false;
+  breathRemaining = 60;
+  clearInterval(breathInterval);
+  document.getElementById("breathPhase").textContent = "准备";
+  document.getElementById("breathSec").textContent = "60s";
+  document.getElementById("breathCircle").classList.remove("expand");
+  document.getElementById("breathActionBtn").textContent = "开始呼吸";
+  document.getElementById("breathModal").classList.add("show");
+}
+
+function closeBreathModal() {
+  breathRunning = false;
+  clearInterval(breathInterval);
+  document.getElementById("breathModal").classList.remove("show");
+}
+
+function toggleBreathTimer() {
+  if (breathRunning) {
+    breathRunning = false;
+    clearInterval(breathInterval);
+    document.getElementById("breathActionBtn").textContent = "继续呼吸";
+    return;
+  }
+  breathRunning = true;
+  document.getElementById("breathActionBtn").textContent = "暂停";
+  updateBreathVisual();
+  breathInterval = setInterval(() => {
+    if (!breathRunning) return;
+    breathRemaining -= 1;
+    if (breathRemaining <= 0) {
+      clearInterval(breathInterval);
+      breathRunning = false;
+      closeBreathModal();
+      state.lastWaterAt = 0;
+      state.bonusWater += 1;
+      saveState();
+      render("完成 60 秒深呼吸急救！已清除浇水冷却并赠送 1 次额外清泉。");
+      return;
+    }
+    updateBreathVisual();
+  }, 1000);
+}
+
+function updateBreathVisual() {
+  const cycle = (60 - breathRemaining) % 10;
+  const circle = document.getElementById("breathCircle");
+  const phaseEl = document.getElementById("breathPhase");
+  const secEl = document.getElementById("breathSec");
+  secEl.textContent = `${breathRemaining}s`;
+  if (cycle < 4) {
+    phaseEl.textContent = "缓慢吸气";
+    circle.classList.add("expand");
+  } else if (cycle < 6) {
+    phaseEl.textContent = "轻轻屏息";
+    circle.classList.add("expand");
+  } else {
+    phaseEl.textContent = "柔和呼气";
+    circle.classList.remove("expand");
+  }
+}
+
+function render(toastMessage = "") {
+  syncDailyQuota();
+  const root = document.getElementById("app");
+
+  if (!state.onboarded) {
+    const startPct = initialHealthStart();
+    const previewStage = treeStageInfo(startPct);
+    root.innerHTML = `
+      <div class="card">
+        <div class="badge badge-green" style="margin-bottom:8px;">森呼吸 · 生命之树</div>
+        <h1>认领你的第一株生命树苗</h1>
+        <p class="sub">根据烟龄与每日吸烟量评估初始受损状态，戒烟越久，树苗越枝繁叶茂。</p>
+
+        <div class="field">
+          <div class="field-head">
+            <span>烟龄</span>
+            <span class="field-val" id="yearsLabel">${state.yearsSmoked} 年</span>
+          </div>
+          <input type="range" min="1" max="35" value="${state.yearsSmoked}" oninput="onOnboardingInput('years', this.value)" />
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <span>每天吸烟数量</span>
+            <span class="field-val" id="cigsLabel">${state.cigsPerDay} 支/天</span>
+          </div>
+          <input type="range" min="1" max="60" value="${state.cigsPerDay}" oninput="onOnboardingInput('cigs', this.value)" />
+        </div>
+
+        <div class="preview-box" id="previewBox">
+          ${renderTreeSVG(previewStage.stage, state.currentSpeciesId, true)}
+          <div>
+            <span class="badge ${previewStage.badgeClass}">${previewStage.name}</span>
+            <div style="font-weight:700;font-size:14px;margin-top:4px;">初始健康指数约 ${startPct}%</div>
+            <div class="sub" style="font-size:12px;">${previewStage.status}</div>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="completeOnboarding()">开始戒烟并种下树苗</button>
+      </div>
+      <div class="disclaimer">科普说明：恢复进度参考 WHO/NHS 公开戒烟时间轴，仅供自我激励，不替代医疗诊断。</div>
+    `;
+    return;
+  }
+
+  const days = totalQuitDays();
+  const cigsAvoided = Math.round(days * state.cigsPerDay);
+  const pct = recoveryPercent();
+  const stageInfo = treeStageInfo(pct);
+  const todayChecked = state.lastCheckinDate === todayStr();
+  const cdMs = getWaterCooldownRemainingMs();
+  const isCooling = cdMs > 0;
+  const canWater = !isCooling && (state.waterCountToday < DAILY_WATER_LIMIT || state.bonusWater > 0);
+  const species = SPECIES_LIST.find(s => s.id === state.currentSpeciesId) || SPECIES_LIST[0];
+
+  if (state.activeTab === "forest") {
+    const count = state.forestTrees.length;
+    const scenery =
+      count === 0 ? "阳光草甸 · 等待第一棵满级大树加入"
+      : count === 1 ? "绿意草甸与蝴蝶 · 第一棵生命树已扎根"
+      : count === 2 ? "清澈溪流与林间小鹿 · 生命森林初具规模"
+      : "森林木屋与双道彩虹 · 茂密生命森林已成型";
+
+    const selected = state.selectedForestTreeIdx !== null ? state.forestTrees[state.selectedForestTreeIdx] : null;
+    const selectedSp = selected ? (SPECIES_LIST.find(s => s.id === selected.speciesId) || SPECIES_LIST[0]) : null;
+
+    root.innerHTML = `
+      <div class="card">
+        <div class="top-bar">
+          <div>
+            <h1 style="font-size:18px;">我的生命森林</h1>
+            <p class="sub">${scenery}</p>
+          </div>
+          <span class="badge badge-green">已成林 ${count} 棵</span>
+        </div>
+
+        <div class="forest-scene">
+          <div style="font-size:12px;color:var(--green);font-weight:600;">
+            累计少吸 ${cigsAvoided} 支香烟 · 已坚持 ${days.toFixed(1)} 天
+          </div>
+          <div class="forest-trees">
+            ${
+              count === 0
+                ? `<div style="padding:36px 12px;color:var(--muted);font-size:13px;">当前树苗达到 100% 后可收入森林，开启下一株新树种。</div>`
+                : state.forestTrees.map((t, idx) => {
+                    const sp = SPECIES_LIST.find(x => x.id === t.speciesId) || SPECIES_LIST[0];
+                    return `
+                      <div class="forest-tree-card" onclick="selectForestTree(${idx})">
+                        <div style="font-size:28px;">${sp.emoji}</div>
+                        <div style="font-weight:700;margin-top:4px;">${sp.name}</div>
+                        <div style="color:var(--muted);font-size:11px;">守护 ${t.days} 天</div>
+                      </div>
+                    `;
+                  }).join("")
+            }
+          </div>
+        </div>
+
+        ${
+          selected
+            ? `<div class="preview-box" style="margin-top:12px;margin-bottom:0;">
+                <div style="font-size:32px;">${selectedSp.emoji}</div>
+                <div>
+                  <div style="font-weight:700;">${selectedSp.name}（达成于 ${selected.completedAt}）</div>
+                  <div class="sub">该周期守护 ${selected.days} 天 · 少吸约 ${selected.cigsAvoided} 支烟</div>
+                </div>
+              </div>`
+            : ""
+        }
+      </div>
+      <div class="disclaimer">每棵树代表一段坚定的无烟旅程，点击森林中的树可查看成长铭牌。</div>
+    `;
+  } else {
+    root.innerHTML = `
+      <div class="top-bar">
+        <div>
+          <h1 style="font-size:18px;">${species.emoji} ${species.name}</h1>
+          <p class="sub">烟龄 ${state.yearsSmoked} 年 · 每日 ${state.cigsPerDay} 支</p>
+        </div>
+        <button class="btn-ghost" onclick="resetOnboarding()">重设档案</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="stat-num">${days.toFixed(1)}</div>
+          <div class="stat-label">累计无烟(天)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">${cigsAvoided}</div>
+          <div class="stat-label">累计少吸(支)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">${state.streakDays}</div>
+          <div class="stat-label">连续打卡(天)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="stage">
+          <div class="stage-top">
+            <span class="badge ${stageInfo.badgeClass}">${stageInfo.name}</span>
+            <span style="font-size:12px;color:var(--muted);">${stageInfo.status}</span>
+          </div>
+          <div class="tree-svg-wrap" id="treeWrap" onclick="petTree()">
+            ${renderTreeSVG(stageInfo.stage, state.currentSpeciesId, false)}
+          </div>
+          <div class="droplet-toast" id="toastMsg">${toastMessage || "轻触树苗可互动，坚持无烟让它舒展新叶"}</div>
+        </div>
+
+        <div style="margin-top:14px;">
+          <div class="field-head" style="margin-bottom:4px;">
+            <span>本株生命恢复进度</span>
+            <span class="field-val">${pct}%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${pct}%;"></div>
+          </div>
+          <div class="sub" style="font-size:12px;">以 365 天为完整周期映射恢复曲线，当前阶段：${stageInfo.name}</div>
+        </div>
+
+        ${
+          pct >= 100
+            ? `<div class="preview-box" style="background:var(--green-soft);border-style:solid;margin-top:12px;">
+                <div>
+                  <div style="font-weight:700;color:var(--green);">本株已达 100% 满级！</div>
+                  <div class="sub">将当前大树存入森林，并解锁下一株新树苗：</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+                    ${SPECIES_LIST.map(s => `<button class="btn-primary" style="width:auto;padding:8px 12px;font-size:12px;" onclick="unlockNewTree('${s.id}')">${s.emoji} 种下${s.name}</button>`).join("")}
+                  </div>
+                </div>
+              </div>`
+            : ""
+        }
+
+        <div class="actions-grid">
+          <button class="btn-soft action-btn" ${todayChecked ? "disabled" : ""} onclick="handleCheckin()">
+            <span>${todayChecked ? "✓ 今日已打卡" : "☀️ 每日无烟打卡"}</span>
+            <span class="sub-note">${todayChecked ? "明日零点更新" : "签收今日阳光"}</span>
+          </button>
+
+          <button class="btn-soft action-btn" id="waterBtn" ${canWater ? "" : "disabled"} onclick="handleWater()">
+            <span id="waterBtnTitle">${
+              isCooling
+                ? "⏳ 冷却吸收中"
+                : state.waterCountToday < DAILY_WATER_LIMIT
+                  ? "💧 给树苗浇水"
+                  : state.bonusWater > 0
+                    ? "✨ 使用额外清泉"
+                    : "🌿 今日已饱饮"
+            }</span>
+            <span class="quota-tag" id="waterQuotaTag">今日 ${state.waterCountToday}/${DAILY_WATER_LIMIT}${state.bonusWater > 0 ? ` (+${state.bonusWater}赠)` : ""}</span>
+            <span class="sub-note" id="waterSubNote">${
+              isCooling
+                ? `还剩 ${formatDuration(cdMs)}`
+                : state.waterCountToday < DAILY_WATER_LIMIT
+                  ? "每 2 小时可浇 1 次"
+                  : state.bonusWater > 0
+                    ? "呼吸急救奖励可用"
+                    : "每日限 3 次，防伤根"
+            }</span>
+          </button>
+        </div>
+
+        <button class="btn-amber" style="width:100%;margin-top:10px;" onclick="openBreathModal()">
+          🫁 烟瘾来袭？做 60 秒深呼吸急救（可获额外清泉）
+        </button>
+      </div>
+
+      <div class="card">
+        <h2>科学戒烟恢复时间轴</h2>
+        ${MILESTONES.map(m => {
+          const reached = days >= m.days;
+          return `
+            <div class="milestone-item ${reached ? "done" : ""}">
+              <div>
+                <div class="milestone-title">${reached ? "✓ " : ""}${m.title}</div>
+                <div class="milestone-desc">${m.desc}</div>
+              </div>
+              <span class="badge ${reached ? "badge-green" : "badge-amber"}">${m.label}</span>
+            </div>
+          `;
+        }).join("")}
+      </div>
+
+      <div class="disclaimer">科普说明：恢复时间轴参考 WHO/NHS 公开资料，仅供自我激励，不替代专业医疗建议。</div>
+    `;
+  }
+
+  root.innerHTML += `
+    <div class="bottom-nav">
+      <button class="nav-btn ${state.activeTab === "tree" ? "active" : ""}" onclick="switchTab('tree')">🌱 生命树苗</button>
+      <button class="nav-btn ${state.activeTab === "forest" ? "active" : ""}" onclick="switchTab('forest')">🌳 生命森林 (${state.forestTrees.length})</button>
+    </div>
+  `;
+}
+
+function onOnboardingInput(type, val) {
+  if (type === "years") {
+    state.yearsSmoked = Number(val);
+    document.getElementById("yearsLabel").textContent = `${state.yearsSmoked} 年`;
+  } else {
+    state.cigsPerDay = Number(val);
+    document.getElementById("cigsLabel").textContent = `${state.cigsPerDay} 支/天`;
+  }
+  const startPct = initialHealthStart();
+  const previewStage = treeStageInfo(startPct);
+  document.getElementById("previewBox").innerHTML = `
+    ${renderTreeSVG(previewStage.stage, state.currentSpeciesId, true)}
+    <div>
+      <span class="badge ${previewStage.badgeClass}">${previewStage.name}</span>
+      <div style="font-weight:700;font-size:14px;margin-top:4px;">初始健康指数约 ${startPct}%</div>
+      <div class="sub" style="font-size:12px;">${previewStage.status}</div>
+    </div>
+  `;
+}
+
+function petTree() {
+  const wrap = document.getElementById("treeWrap");
+  if (!wrap) return;
+  wrap.classList.remove("bounce");
+  void wrap.offsetWidth;
+  wrap.classList.add("bounce");
+  const toast = document.getElementById("toastMsg");
+  if (toast) toast.textContent = "树叶轻轻颤动了一下，每一次忍住烟瘾都在滋养它。";
+}
+
+function switchTab(tab) {
+  state.activeTab = tab;
+  state.selectedForestTreeIdx = null;
+  saveState();
+  render();
+}
+
+function selectForestTree(idx) {
+  state.selectedForestTreeIdx = idx;
+  render();
+}
+
+// 每秒刷新冷却倒计时与无烟时长
+setInterval(() => {
+  if (!state.onboarded || state.activeTab !== "tree") return;
+  const cdMs = getWaterCooldownRemainingMs();
+  const titleEl = document.getElementById("waterBtnTitle");
+  const subEl = document.getElementById("waterSubNote");
+  const btnEl = document.getElementById("waterBtn");
+  if (!titleEl || !subEl || !btnEl) return;
+
+  if (cdMs > 0) {
+    titleEl.textContent = "⏳ 冷却吸收中";
+    subEl.textContent = `还剩 ${formatDuration(cdMs)}`;
+    btnEl.disabled = true;
+  } else if (btnEl.disabled && (state.waterCountToday < DAILY_WATER_LIMIT || state.bonusWater > 0)) {
+    render();
+  }
+}, 1000);
+
+render();
+</script>
+</body>
+</html>
