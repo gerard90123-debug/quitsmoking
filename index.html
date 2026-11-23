@@ -2,17 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 移动端视口设置：适配 iPhone 刘海/灵动岛并防止双击缩放 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <!-- iOS 主屏幕 Web App 独立运行配置 -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="森呼吸">
     <meta name="theme-color" content="#10b981">
     <title>森呼吸 · 生命之树 - 科学戒烟与生命森林养成</title>
-    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入中文字体 -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -31,7 +24,6 @@
             padding: 0;
         }
 
-        /* 移动端自适应容器：手机端全屏铺满，桌面端居中呈现代移动视窗 */
         .mini-app-shell {
             width: 100%;
             max-width: 430px;
@@ -61,10 +53,10 @@
             scrollbar-width: none;
         }
 
-        /* 动画定义 */
+        /* 树苗与生态动画定义 */
         @keyframes breatheWeak {
             0%, 100% { transform: scaleY(1) rotate(0deg); }
-            50% { transform: scaleY(0.97) rotate(-1.5deg); }
+            50% { transform: scaleY(0.965) rotate(-1.6deg); }
         }
         @keyframes swayGentle {
             0%, 100% { transform: rotate(-1.5deg); }
@@ -72,8 +64,8 @@
         }
         @keyframes happyBounce {
             0%, 100% { transform: scale(1, 1) translateY(0); }
-            25% { transform: scale(1.06, 0.94) translateY(3px); }
-            50% { transform: scale(0.96, 1.05) translateY(-6px); }
+            25% { transform: scale(1.07, 0.93) translateY(3px); }
+            50% { transform: scale(0.96, 1.05) translateY(-7px); }
             75% { transform: scale(1.02, 0.98) translateY(1px); }
         }
         @keyframes floatSlow {
@@ -85,18 +77,13 @@
             50% { transform: translateX(12px); }
         }
         @keyframes waterDrop {
-            0% { opacity: 1; transform: translateY(-30px) scale(0.8); }
+            0% { opacity: 1; transform: translateY(-28px) scale(0.8); }
             70% { opacity: 1; transform: translateY(45px) scale(1); }
             100% { opacity: 0; transform: translateY(55px) scale(1.3, 0.4); }
         }
         @keyframes leafFall {
             0% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
             100% { opacity: 0; transform: translate(35px, 90px) rotate(160deg); }
-        }
-        @keyframes pulseRing {
-            0% { transform: scale(0.85); opacity: 0.7; }
-            50% { transform: scale(1.35); opacity: 0.25; }
-            100% { transform: scale(0.85); opacity: 0.7; }
         }
         @keyframes sunSpin {
             from { transform: rotate(0deg); }
@@ -109,7 +96,7 @@
 
         .tree-weak {
             transform-origin: 150px 210px;
-            animation: breatheWeak 3.5s ease-in-out infinite;
+            animation: breatheWeak 3.4s ease-in-out infinite;
         }
         .tree-healthy {
             transform-origin: 150px 210px;
@@ -135,15 +122,20 @@
         .falling-leaf-anim {
             animation: leafFall 1.6s ease-out forwards;
         }
-        .breath-circle {
-            animation: pulseRing 8s ease-in-out infinite;
-        }
         .aura-glow {
             transform-origin: 150px 112px;
             animation: glowPulse 3.5s ease-in-out infinite;
         }
 
-        /* 自定义滑块 */
+        /* 60秒深呼吸圆环动态缩放 */
+        .breath-orb {
+            transition: transform 0.85s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.6s ease;
+        }
+        .breath-halo {
+            transition: transform 0.85s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease;
+        }
+
+        /* 自定义滑块样式 */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
@@ -176,90 +168,97 @@
 <body>
 
 <div class="mini-app-shell" id="app">
-    <!-- 顶部状态栏与快捷操作 -->
+    <!-- 顶部栏：品牌与复吸/重设入口 -->
     <div class="px-5 pt-3 pb-2 flex items-center justify-between text-xs font-medium text-slate-600 z-30 shrink-0 select-none" style="padding-top: max(12px, env(safe-area-inset-top));">
         <div class="flex items-center gap-1.5">
-            <span id="clock-time" class="font-semibold text-slate-800 tabular-nums">13:15</span>
+            <span id="clock-time" class="font-semibold text-slate-800 tabular-nums">15:20</span>
             <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">森呼吸 · 生命之树</span>
         </div>
         <div class="flex items-center gap-1.5">
-            <button onclick="openBookmarkTipModal()" class="bg-white/90 border border-slate-200/80 text-slate-700 hover:text-emerald-600 rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-2xs transition">
-                📲 存到桌面
+            <button id="btn-relapse-top" onclick="openRelapseModal()" title="记录复吸" class="hidden bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 rounded-full px-2.5 py-1 flex items-center gap-1 text-[11px] font-semibold transition active:scale-95">
+                <span>破戒/复吸</span>
             </button>
-            <button id="btn-reset-top" onclick="openResetModal()" title="重新评估烟龄" class="bg-white/90 border border-slate-200/80 text-slate-600 hover:text-rose-600 rounded-full px-2.5 py-1 flex items-center gap-1 text-[11px] font-medium shadow-2xs transition">
+            <button id="btn-reset-top" onclick="openResetModal()" title="重设评估" class="bg-white/95 border border-slate-200/80 text-slate-600 hover:text-rose-600 rounded-full px-2.5 py-1 flex items-center gap-1 text-[11px] font-semibold shadow-2xs transition active:scale-95">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 <span>重设</span>
             </button>
         </div>
     </div>
 
-    <!-- ==================== 页面 1：初始评估页 (Onboarding) ==================== -->
-    <div id="view-onboarding" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-8 pt-1 flex flex-col justify-between hidden">
+    <!-- ==================== 页面 1：初始烟龄与日吸烟量评估页（4档树苗预览） ==================== -->
+    <div id="view-onboarding" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-7 pt-1 flex flex-col justify-between hidden">
         <div>
-            <div class="mt-1 mb-4">
+            <div class="mt-1 mb-3.5">
                 <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium mb-1.5">
                     <span>🌱 WHO / NHS 临床戒烟自愈模型</span>
                 </div>
-                <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">种下你的第一株生命树</h1>
-                <p class="text-xs text-slate-500 mt-1 leading-relaxed">烟龄与烟量决定了树苗的初始受损程度。坚持戒烟 <strong class="text-emerald-700">365 天（1年）</strong> 达成 100% 肺部焕新，即可将参天大树移入「我的生命森林」并解锁第二株新树苗！</p>
+                <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">种下你的生命之树</h1>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    填写烟龄与日吸烟量评估初始受损程度。首棵<strong>希望香樟</strong>仅需 <strong class="text-emerald-700">7 天</strong>（配合打卡与浇水可更快）即可长成完整大树存入「我的生命森林」，解锁小昆虫、花草与更丰富的树种！
+                </p>
             </div>
 
-            <!-- 实时预览小树苗状态卡片 -->
-            <div id="preview-card" class="rounded-3xl p-4 mb-4 border transition-all duration-500 bg-gradient-to-b from-amber-50/90 to-stone-100 border-amber-200/80 relative overflow-hidden">
+            <!-- 小树苗初始状态预览卡片（4档：焦枯残苗 / 灰黄弱苗 / 微绿待长苗 / 翠绿初生苗） -->
+            <div id="preview-card" class="rounded-3xl p-4 mb-3.5 border transition-all duration-500 bg-gradient-to-b from-amber-50/90 to-stone-100 border-amber-200/80 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-xs font-semibold text-slate-600">第 1 株 · 希望白桦（初始状态）</span>
-                    <span id="preview-status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700">濒危枯萎</span>
+                    <span class="text-xs font-semibold text-slate-600">阶段一 · 希望香樟（初始树苗预览）</span>
+                    <span id="preview-status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700">焦枯残苗</span>
                 </div>
 
-                <!-- 预览 SVG 容器 -->
                 <div class="h-32 flex items-center justify-center relative" id="onboarding-tree-preview"></div>
 
-                <!-- 初始健康起点与损耗指数条 -->
-                <div class="mt-1 bg-white/85 backdrop-blur-xs rounded-2xl p-3 border border-white">
-                    <div class="flex justify-between items-center text-xs mb-1.5">
-                        <span class="text-slate-600 font-medium">初始心肺健康起点</span>
-                        <span id="preview-health-start" class="font-bold text-rose-600 text-sm tabular-nums">12.0%</span>
+                <div class="mt-1 bg-white/90 backdrop-blur-xs rounded-2xl p-3 border border-white space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-600 font-semibold">🔥 肺部与生命损耗指数</span>
+                        <span id="preview-damage-index" class="font-extrabold text-rose-600 text-sm tabular-nums">68 / 100</span>
                     </div>
-                    <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                        <div id="preview-health-bar" class="h-full bg-gradient-to-r from-rose-500 to-amber-400 rounded-full transition-all duration-300" style="width: 12%"></div>
+                    <div class="w-full h-2 bg-rose-100 rounded-full overflow-hidden">
+                        <div id="preview-damage-bar" class="h-full bg-gradient-to-r from-amber-500 to-rose-600 rounded-full transition-all duration-300" style="width: 68%"></div>
                     </div>
-                    <p id="preview-desc" class="text-[11px] text-slate-500 mt-2 leading-snug">
-                        “长期的烟雾让它叶片干枯卷曲、土壤干裂，急需你用无烟的清新空气将它唤醒……”
+
+                    <div class="flex justify-between items-center text-[11px] pt-0.5">
+                        <span class="text-slate-500">初始心肺恢复起点</span>
+                        <span id="preview-health-start" class="font-bold text-amber-700 tabular-nums">10.0%</span>
+                    </div>
+                    <p id="preview-desc" class="text-[11px] text-slate-500 leading-snug">
+                        “主干偏焦褐、叶片稀少萎垂，需要立刻戒烟让它慢慢缓过来。”
                     </p>
                 </div>
             </div>
 
-            <!-- 输入表单区 -->
-            <div class="space-y-3.5 bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
+            <!-- 烟龄、日吸烟量与单包均价表单 -->
+            <div class="space-y-3 bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-semibold text-slate-700">⏳ 吸烟年限（烟龄）</label>
+                        <label for="input-years" class="text-xs font-semibold text-slate-700">⏳ 吸烟年限（烟龄）</label>
                         <div class="flex items-baseline gap-1">
-                            <span id="val-years" class="text-lg font-bold text-emerald-600 tabular-nums">5</span>
+                            <span id="val-years" class="text-lg font-bold text-emerald-600 tabular-nums">8</span>
                             <span class="text-xs text-slate-400">年</span>
                         </div>
                     </div>
-                    <input type="range" id="input-years" min="1" max="40" value="5" oninput="updateOnboardingPreview()">
+                    <input type="range" id="input-years" min="1" max="40" value="8" oninput="updateOnboardingPreview()">
                     <div class="flex justify-between text-[10px] text-slate-400 mt-0.5">
                         <span>1年</span>
                         <span>15年</span>
-                        <span>30年+</span>
+                        <span>30年</span>
+                        <span>40年</span>
                     </div>
                 </div>
 
                 <div class="pt-2 border-t border-slate-100">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-semibold text-slate-700">🚬 每日吸烟数量</label>
+                        <label for="input-cigs" class="text-xs font-semibold text-slate-700">🚬 每天吸烟数量</label>
                         <div class="flex items-baseline gap-1">
-                            <span id="val-cigs" class="text-lg font-bold text-emerald-600 tabular-nums">15</span>
+                            <span id="val-cigs" class="text-lg font-bold text-emerald-600 tabular-nums">20</span>
                             <span class="text-xs text-slate-400">支/天</span>
                         </div>
                     </div>
-                    <input type="range" id="input-cigs" min="1" max="60" value="15" oninput="updateOnboardingPreview()">
+                    <input type="range" id="input-cigs" min="1" max="60" value="20" oninput="updateOnboardingPreview()">
                     <div class="flex justify-between text-[10px] text-slate-400 mt-0.5">
-                        <span>偶尔(1-5支)</span>
-                        <span>一包(20支)</span>
-                        <span>重度(40支+)</span>
+                        <span>1支</span>
+                        <span>15支</span>
+                        <span>30支</span>
+                        <span>60支</span>
                     </div>
                 </div>
 
@@ -275,90 +274,97 @@
         </div>
 
         <button onclick="claimTreeAndStart()" class="mt-4 w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 hover:opacity-95 active:scale-[0.98] transition flex items-center justify-center gap-2">
-            <span>🌱 认领第 1 株小树苗，开启戒烟之旅</span>
+            <span>🌱 认领我的生命树</span>
         </button>
     </div>
 
-    <!-- ==================== 页面 2：主界面 (培育页 / 生命森林全景页 / 医学恢复页) ==================== -->
+    <!-- ==================== 页面 2：养成主界面 ==================== -->
     <div id="view-main" class="flex-1 flex flex-col overflow-hidden hidden">
-        
-        <!-- 主滚动内容区 -->
         <div id="main-scroll-area" class="flex-1 overflow-y-auto no-scrollbar pb-24">
-            
-            <!-- ==================== TAB 1: 当前树苗培育与实时心肺看板 ==================== -->
+
+            <!-- ==================== TAB 1: 当前树苗培育与实时心肺恢复 ==================== -->
             <div id="tab-home" class="px-4 pt-1 space-y-3.5">
-                
+
                 <!-- 树苗生态舞台卡片 -->
                 <div id="tree-stage-bg" class="relative rounded-3xl p-4 transition-all duration-700 overflow-hidden border border-white/70 shadow-sm bg-gradient-to-b from-stone-200 via-amber-50/70 to-stone-100">
-                    
-                    <!-- 顶部树种与阶段信息栏 -->
-                    <div class="flex items-start justify-between relative z-10">
-                        <div>
+                    <div class="flex items-start justify-between relative z-10 gap-2">
+                        <div class="min-w-0">
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <span id="tree-order-pill" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-800/80 text-white">第 1 株 · 希望白桦</span>
+                                <span id="tree-order-pill" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-800/80 text-white">第 1 株 · 希望香樟</span>
                                 <span id="stage-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 shadow-2xs">濒危枯苗</span>
                             </div>
-                            <p id="tree-mood-text" class="text-xs text-slate-600 mt-1.5 font-medium">“好干渴…快用无烟空气唤醒我的根系吧”</p>
+                            <p id="tree-mood-text" class="text-xs text-slate-600 mt-1.5 font-medium leading-snug">“好干渴…土壤都裂开了，快用无烟空气唤醒我吧…”</p>
                         </div>
 
-                        <!-- 100% 满级进度胶囊 -->
                         <div class="bg-white/90 backdrop-blur-xs rounded-2xl px-2.5 py-1.5 text-right border border-white shadow-2xs shrink-0">
-                            <div class="text-[10px] text-slate-400">本株心肺恢复度</div>
-                            <div id="tree-recovery-pct-badge" class="text-sm font-extrabold text-emerald-600 tabular-nums">12.0%</div>
+                            <div class="text-[10px] text-slate-400">本株恢复度</div>
+                            <div id="tree-recovery-pct-badge" class="text-sm font-extrabold text-emerald-600 tabular-nums">10.0%</div>
                         </div>
                     </div>
 
-                    <!-- 树苗主画布区域 -->
+                    <!-- 可点击互动的树苗画布 -->
                     <div onclick="petTreeInteraction()" class="relative h-52 w-full flex items-center justify-center cursor-pointer my-1" id="main-tree-container">
-                        <!-- 互动提示气泡 -->
-                        <div id="tree-speech-bubble" class="opacity-0 transition-all duration-300 transform -translate-y-1 absolute top-2 bg-white/95 backdrop-blur-xs px-3 py-1.5 rounded-2xl shadow-md border border-emerald-100 text-xs font-medium text-emerald-800 z-20 pointer-events-none text-center max-w-[240px]">
+                        <div id="tree-speech-bubble" class="opacity-0 transition-all duration-300 transform -translate-y-1 absolute top-2 bg-white/95 backdrop-blur-xs px-3 py-1.5 rounded-2xl shadow-md border border-emerald-100 text-xs font-medium text-emerald-800 z-20 pointer-events-none text-center max-w-[245px]">
                             谢谢你的抚摸，空气变清新啦！
                         </div>
 
-                        <!-- SVG 树苗渲染区 -->
                         <div id="main-tree-svg-wrapper" class="w-full h-full flex items-center justify-center"></div>
 
-                        <!-- 100% 满级解锁第二株悬浮横幅 -->
                         <div id="tree-mature-banner" class="hidden absolute bottom-1 inset-x-2 z-20">
                             <button onclick="event.stopPropagation(); openUnlockNextTreeModal();" class="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-600 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 flex items-center justify-between animate-bounce">
-                                <span>🎉 已达 100% 满级！入驻森林并解锁新树苗</span>
-                                <span class="bg-white/25 px-2 py-0.5 rounded-lg">去种植 →</span>
+                                <span>🎉 大树已长成！入驻森林解锁生态与下一树种</span>
+                                <span class="bg-white/25 px-2 py-0.5 rounded-lg">去解锁 →</span>
                             </button>
                         </div>
 
-                        <!-- 特效层 -->
                         <div id="fx-layer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
                     </div>
 
-                    <!-- 底部进度条与自然生长说明（无任何快进按钮） -->
-                    <div class="relative z-10 bg-white/80 backdrop-blur-xs rounded-2xl p-2.5 border border-white/90">
+                    <!-- 365天满级进度条与养分状态 -->
+                    <div class="relative z-10 bg-white/85 backdrop-blur-xs rounded-2xl p-2.5 border border-white/90">
                         <div class="flex justify-between items-center text-[11px] mb-1">
                             <span class="font-semibold text-slate-700 flex items-center gap-1">
-                                <span>🫁 距离本株满级 (365天)：</span>
-                                <span id="tree-days-progress-text" class="text-emerald-600 font-bold tabular-nums">0.0 / 365 天</span>
+                                <span>🌱 成林进度：</span>
+                                <span id="tree-days-progress-text" class="text-emerald-600 font-bold tabular-nums">0.0 / 7.0 天</span>
                             </span>
-                            <span id="tree-water-bonus-text" class="text-[10px] text-sky-600 font-medium tabular-nums">甘露加速 +0.0天</span>
+                            <span id="tree-water-bonus-text" class="text-[10px] text-sky-600 font-semibold tabular-nums">养分加速 +0.0天</span>
                         </div>
                         <div class="w-full h-2.5 bg-slate-200/80 rounded-full overflow-hidden p-0.5">
-                            <div id="stage-progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-500 rounded-full transition-all duration-500" style="width: 12%"></div>
+                            <div id="stage-progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-500 rounded-full transition-all duration-500" style="width: 10%"></div>
                         </div>
                         <div class="mt-1.5 flex items-center justify-between text-[10px] text-slate-400">
-                            <span>🌿 真实呼吸计时 · 每日限浇3次 · 间隔2小时</span>
+                            <span>🌿 真实计时 · 每日限浇3次 · 间隔2小时</span>
                             <span id="total-water-lifetime" class="text-slate-500 font-medium tabular-nums">本株浇水 0 次</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 核心互动操作区（打卡 + 每日限3次/2小时冷却浇水） -->
+                <!-- 醒目 60 秒烟瘾深呼吸急救横幅（复吸清零警示 + 稳住心神赢清泉） -->
+                <div class="bg-gradient-to-r from-rose-50 via-amber-50 to-orange-50 rounded-2xl p-3 border border-rose-200/80 shadow-2xs">
+                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                        <div class="text-xs font-extrabold text-rose-700 flex items-center gap-1">
+                            <span>🚨 烟瘾高危时刻？60秒深呼吸稳住！</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-bold">复吸会清零</span>
+                    </div>
+                    <p class="text-[10px] text-slate-600 leading-snug mb-2">
+                        吸一口会让小树退回起点并清空进度；现在做 <strong>60 秒节律呼吸</strong> 可清零 2 小时冷却并奖励 <strong>1 次急救甘露</strong>（可超 3 次上限）。
+                    </p>
+                    <button onclick="openCravingModal()" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:opacity-95 text-white text-xs font-bold shadow-sm shadow-rose-500/20 active:scale-[0.98] transition flex items-center justify-center gap-1.5">
+                        <span>🫁 立即开始 60 秒烟瘾急救呼吸</span>
+                    </button>
+                </div>
+
+                <!-- 核心互动操作区：每日无烟打卡 + 浇水 -->
                 <div class="grid grid-cols-2 gap-2.5">
                     <button id="btn-checkin" onclick="dailyCheckIn()" class="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 flex flex-col justify-between text-left transition active:scale-[0.97]">
                         <div class="flex items-center justify-between w-full mb-1">
                             <span class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-base">☀️</span>
-                            <span id="streak-badge" class="text-[10px] font-bold bg-black/15 px-2 py-0.5 rounded-full">已连签 0 天</span>
+                            <span id="streak-badge" class="text-[10px] font-bold bg-black/15 px-2 py-0.5 rounded-full">连签 0 天</span>
                         </div>
                         <div>
-                            <div id="checkin-title" class="font-bold text-sm">今日戒烟打卡</div>
-                            <div id="checkin-sub" class="text-[11px] text-emerald-100 mt-0.5">加速树苗生长 (+1.5天效)</div>
+                            <div id="checkin-title" class="font-bold text-sm">每日无烟打卡</div>
+                            <div id="checkin-sub" class="text-[11px] text-emerald-100 mt-0.5">增加养分 (+1.5天效)</div>
                         </div>
                     </button>
 
@@ -369,96 +375,21 @@
                         </div>
                         <div>
                             <div id="water-title" class="font-bold text-sm">给树苗浇水</div>
-                            <div id="water-sub" class="text-[11px] text-sky-100 mt-0.5 tabular-nums">甘露滋润 (+0.5天效)</div>
+                            <div id="water-sub" class="text-[11px] text-sky-100 mt-0.5 tabular-nums">滋润根系 (+0.5天效)</div>
                         </div>
                     </button>
                 </div>
 
-                <!-- ==================== 科学临床心肺恢复仪表盘 ==================== -->
-                <div class="bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
-                    <div class="flex items-center justify-between mb-2.5">
-                        <div>
-                            <h2 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                                <span class="w-1.5 h-3.5 rounded-full bg-emerald-500"></span>
-                                <span>科学临床心肺恢复仪表盘</span>
-                            </h2>
-                            <p class="text-[10px] text-slate-400 mt-0.5">基于 WHO / 美国癌症协会 / 英国 NHS 戒烟医学模型</p>
-                        </div>
-                        <button onclick="switchTab('milestones')" class="text-[11px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-xl transition">
-                            医学时间轴 →
-                        </button>
-                    </div>
-
-                    <!-- 当前医学状态提示条 -->
-                    <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-2.5 mb-3 flex items-start gap-2.5">
-                        <span class="text-base mt-0.5">🩺</span>
-                        <div class="flex-1 min-w-0">
-                            <div class="text-[11px] font-bold text-emerald-900" id="clinical-stage-title">正在启动身体自我修复机制…</div>
-                            <p class="text-[11px] text-emerald-700/90 mt-0.5 leading-snug" id="clinical-stage-desc">停止吸烟后，心率与血压率先开始回落，树苗根系重新恢复吸水。</p>
-                        </div>
-                    </div>
-
-                    <!-- 四项核心临床生理恢复指标 -->
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
-                            <div class="flex justify-between items-center text-[11px] mb-1">
-                                <span class="text-slate-600 font-medium">🩸 一氧化碳清除</span>
-                                <span id="med-co-val" class="font-extrabold text-sky-600 tabular-nums">0%</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div id="med-co-bar" class="h-full bg-sky-500 rounded-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                            <div class="text-[9px] text-slate-400 mt-1">12小时血氧恢复正常</div>
-                        </div>
-
-                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
-                            <div class="flex justify-between items-center text-[11px] mb-1">
-                                <span class="text-slate-600 font-medium">🫁 肺部纤毛再生度</span>
-                                <span id="med-cilia-val" class="font-extrabold text-emerald-600 tabular-nums">0.0%</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div id="med-cilia-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                            <div class="text-[9px] text-slate-400 mt-1">1~9个月清除焦油粘液</div>
-                        </div>
-
-                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
-                            <div class="flex justify-between items-center text-[11px] mb-1">
-                                <span class="text-slate-600 font-medium">🌬️ 肺功能提升幅度</span>
-                                <span id="med-lung-val" class="font-extrabold text-teal-600 tabular-nums">+0.0%</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div id="med-lung-bar" class="h-full bg-teal-500 rounded-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                            <div class="text-[9px] text-slate-400 mt-1">3个月肺功能最高提升30%</div>
-                        </div>
-
-                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
-                            <div class="flex justify-between items-center text-[11px] mb-1">
-                                <span class="text-slate-600 font-medium">❤️ 冠心病风险降幅</span>
-                                <span id="med-heart-val" class="font-extrabold text-rose-500 tabular-nums">-0.0%</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div id="med-heart-bar" class="h-full bg-rose-400 rounded-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                            <div class="text-[9px] text-slate-400 mt-1">满1年额外风险降低50%</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 实时戒烟数据看板 & 烟瘾急救 -->
+                <!-- 累计戒烟时长与收益看板 -->
                 <div class="bg-white rounded-3xl p-4 shadow-xs border border-slate-100 space-y-3">
                     <div class="flex items-center justify-between">
                         <h2 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                             <span class="w-1.5 h-3.5 rounded-full bg-amber-500"></span>
-                            <span>累计戒烟成果</span>
+                            <span>累计无烟时长与收获</span>
                         </h2>
-                        <button onclick="openCravingModal()" class="px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold flex items-center gap-1 transition">
-                            <span>🌬️ 烟瘾急救呼吸</span>
-                        </button>
+                        <span id="user-baseline-summary" class="text-[10px] text-slate-400">烟龄 8年 · 20支/天</span>
                     </div>
 
-                    <!-- 跳动计时器 -->
                     <div class="bg-slate-50 rounded-2xl p-2.5 border border-slate-100 flex items-center justify-around text-center">
                         <div>
                             <div id="timer-days" class="text-lg font-extrabold text-slate-800 tabular-nums">0</div>
@@ -481,10 +412,9 @@
                         </div>
                     </div>
 
-                    <!-- 三项量化收益 -->
                     <div class="grid grid-cols-3 gap-2 text-center">
                         <div class="bg-emerald-50/60 rounded-2xl p-2 border border-emerald-100/80">
-                            <div class="text-[10px] text-slate-500">少抽香烟</div>
+                            <div class="text-[10px] text-slate-500">少吸香烟</div>
                             <div class="text-sm font-extrabold text-emerald-700 tabular-nums"><span id="stat-cigs">0</span> <span class="text-[10px] font-normal">支</span></div>
                         </div>
                         <div class="bg-amber-50/60 rounded-2xl p-2 border border-amber-100/80">
@@ -492,26 +422,26 @@
                             <div class="text-sm font-extrabold text-amber-700 tabular-nums">¥<span id="stat-money">0.0</span></div>
                         </div>
                         <div class="bg-sky-50/60 rounded-2xl p-2 border border-sky-100/80">
-                            <div class="text-[10px] text-slate-500">重获寿命</div>
+                            <div class="text-[10px] text-slate-500">挽回寿命</div>
                             <div class="text-sm font-extrabold text-sky-700 tabular-nums"><span id="stat-life">0分</span></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ==================== TAB 2: 蚂蚁森林式「我的生命森林」全景图 ==================== -->
+            <!-- ==================== TAB 2: 我的生命森林全景 + 肺部恢复阶段对齐的丰富树木图鉴 ==================== -->
             <div id="tab-forest" class="px-4 pt-1 space-y-3.5 hidden">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-lg font-extrabold text-slate-800 flex items-center gap-1.5">
                             <span>🌳 我的生命森林</span>
-                            <span id="forest-level-badge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">初生林地</span>
+                            <span id="forest-level-badge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">希望草甸</span>
                         </h2>
-                        <p class="text-xs text-slate-500 mt-0.5">每坚持戒烟 1 年（100%肺部焕新），永久种下一棵参天大树</p>
+                        <p class="text-xs text-slate-500 mt-0.5">树种图鉴与肺部恢复阶段一一对应，坚持戒烟逐步点亮</p>
                     </div>
                 </div>
 
-                <!-- 全景交互画卷 -->
+                <!-- 森林全景 SVG 画卷 -->
                 <div class="relative rounded-3xl overflow-hidden border border-emerald-200/80 shadow-md bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-100">
                     <div class="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
                         <div class="bg-white/85 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-xs border border-white flex items-center gap-3">
@@ -521,65 +451,151 @@
                             </div>
                             <div class="w-[1px] h-5 bg-slate-200"></div>
                             <div>
-                                <div class="text-[9px] text-slate-400">培育中幼苗</div>
-                                <div class="text-xs font-extrabold text-amber-600">1 株</div>
+                                <div class="text-[9px] text-slate-400">图鉴已解锁</div>
+                                <div class="text-xs font-extrabold text-teal-700"><span id="forest-atlas-count">1</span> / 6 种</div>
                             </div>
                         </div>
 
                         <div class="bg-white/85 backdrop-blur-md px-2.5 py-1.5 rounded-2xl shadow-xs border border-white text-right">
-                            <div class="text-[9px] text-slate-400">生态解锁</div>
-                            <div id="forest-eco-text" class="text-[11px] font-bold text-teal-700">草地 · 蝴蝶</div>
+                            <div class="text-[9px] text-slate-400">当前生态</div>
+                            <div id="forest-eco-text" class="text-[11px] font-bold text-teal-700">阳光草甸 · 彩蝶</div>
                         </div>
                     </div>
 
                     <div id="forest-panorama-container" class="w-full h-80 relative"></div>
 
                     <div class="bg-white/90 backdrop-blur-xs px-3.5 py-2 border-t border-emerald-100 flex items-center justify-between text-[11px]">
-                        <span class="text-slate-600">👆 点击森林中的任意树木查看专属成长铭牌</span>
+                        <span class="text-slate-600">👆 点击森林中的树木查看守护档案</span>
                         <button id="forest-unlock-shortcut" onclick="openUnlockNextTreeModal()" class="hidden px-2.5 py-1 rounded-xl bg-emerald-500 text-white font-bold shadow-xs animate-pulse">
-                            + 种下新树苗
+                            + 解锁下一阶段树种
                         </button>
                     </div>
                 </div>
 
-                <!-- 森林生态进阶指南 -->
+                <!-- 森林生态演化阶段卡片（树木成林后逐步解锁昆虫、花草与小动物） -->
                 <div class="bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
-                    <h3 class="text-xs font-bold text-slate-800 mb-2.5 flex items-center gap-1.5">
-                        <span>✨ 森林生态演化图鉴</span>
-                    </h3>
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+                            <span>✨ 森林生态演化阶段（成林后解锁）</span>
+                        </h3>
+                        <span id="eco-stage-status-pill" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">尚未有成林大树</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mb-2.5 leading-snug">每当一棵树长成并存入森林，生态圈就会迎来新的花草、昆虫与动物伙伴：</p>
                     <div class="grid grid-cols-3 gap-2 text-center">
-                        <div id="eco-card-1" class="p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200">
-                            <div class="text-lg mb-1">🦋</div>
-                            <div class="text-[11px] font-bold text-slate-800">1 棵树 · 希望草甸</div>
-                            <div class="text-[9px] text-emerald-700 mt-0.5">彩蝶飞舞与阳光草地</div>
+                        <div id="eco-card-1" class="p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-65 transition">
+                            <div class="text-lg mb-1">🦋🌸</div>
+                            <div class="text-[11px] font-bold text-slate-800">成林 1 棵</div>
+                            <div class="text-[9px] text-slate-500 mt-0.5">野花灌木与蝴蝶飞舞</div>
                         </div>
-                        <div id="eco-card-2" class="p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-60">
-                            <div class="text-lg mb-1">🦌</div>
-                            <div class="text-[11px] font-bold text-slate-800">2 棵树 · 灵鹿溪谷</div>
-                            <div class="text-[9px] text-slate-500 mt-0.5">清澈溪流与林间小鹿</div>
+                        <div id="eco-card-2" class="p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-65 transition">
+                            <div class="text-lg mb-1">🐝🦌</div>
+                            <div class="text-[11px] font-bold text-slate-800">成林 2 棵</div>
+                            <div class="text-[9px] text-slate-500 mt-0.5">蜜蜂蜻蜓、溪流与小鹿</div>
                         </div>
-                        <div id="eco-card-3" class="p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-60">
-                            <div class="text-lg mb-1">🏡</div>
-                            <div class="text-[11px] font-bold text-slate-800">3 棵+ · 彩虹秘境</div>
-                            <div class="text-[9px] text-slate-500 mt-0.5">森林木屋与双道彩虹</div>
+                        <div id="eco-card-3" class="p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-65 transition">
+                            <div class="text-lg mb-1">🏡🌈</div>
+                            <div class="text-[11px] font-bold text-slate-800">成林 3 棵+</div>
+                            <div class="text-[9px] text-slate-500 mt-0.5">林间木屋、彩虹与百鸟</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 树木档案列表 -->
+                <!-- 丰富树木图鉴：与肺部恢复阶段性目标严格对齐（6大阶段树种） -->
+                <div class="bg-white rounded-3xl p-4 shadow-xs border border-slate-100 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+                                <span>📖 生命树木图鉴 · 肺部恢复阶段对照</span>
+                            </h3>
+                            <p class="text-[10px] text-slate-400 mt-0.5">随肺部恢复里程碑与成林进度逐步点亮，已解锁树种可切换当前养育形象</p>
+                        </div>
+                        <span id="atlas-progress-pill" class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold tabular-nums">1/6 已解锁</span>
+                    </div>
+
+                    <div id="species-atlas-list" class="space-y-2.5"></div>
+                </div>
+
+                <!-- 森林树木守护档案列表 -->
                 <div>
                     <h3 class="text-xs font-bold text-slate-700 mb-2 px-1">📜 树木守护档案</h3>
                     <div id="forest-tree-cards-list" class="space-y-2.5"></div>
                 </div>
             </div>
 
-            <!-- ==================== TAB 3: WHO / NHS 医学恢复时间轴 ==================== -->
+            <!-- ==================== TAB 3: 第三个页面 —— 仅保留肺部修复进度功能 ==================== -->
             <div id="tab-milestones" class="px-4 pt-1 space-y-3.5 hidden">
                 <div>
-                    <h2 class="text-lg font-extrabold text-slate-800">科学戒烟临床时间轴</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">参考 WHO、美国癌症协会及英国 NHS 戒烟临床指南</p>
+                    <h2 class="text-lg font-extrabold text-slate-800 flex items-center gap-1.5">
+                        <span>🫁 肺部修复进度</span>
+                        <span id="lung-overall-badge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold tabular-nums">0.0%</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">对照戒烟生理修复时间轴，查看肺部各维度修复进度与对应树种图鉴</p>
                 </div>
-                <div id="health-timeline-list" class="space-y-3 relative before:content-[''] before:absolute before:left-[15px] before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200"></div>
+
+                <!-- 肺部核心修复总览卡片 -->
+                <div class="bg-white rounded-3xl p-4 shadow-xs border border-slate-100 space-y-3">
+                    <div class="bg-emerald-50/75 border border-emerald-100 rounded-2xl p-3 flex items-start gap-2.5">
+                        <span class="text-lg mt-0.5">🫁</span>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-xs font-extrabold text-emerald-900" id="lung-stage-headline">肺部修复阶段一：启动清烟与降碳</span>
+                                <span class="text-[11px] font-extrabold text-emerald-700 tabular-nums" id="lung-total-pct-text">0.0%</span>
+                            </div>
+                            <p class="text-[11px] text-emerald-800/85 mt-0.5 leading-snug" id="lung-stage-summary">
+                                停止吸入烟雾后，气道刺激减弱，血液一氧化碳逐步下降，肺部开始恢复清洁与通气。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
+                            <div class="flex justify-between items-center text-[11px] mb-1">
+                                <span class="text-slate-600 font-medium">🩸 血氧与一氧化碳</span>
+                                <span id="med-co-val" class="font-extrabold text-sky-600 tabular-nums">0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div id="med-co-bar" class="h-full bg-sky-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="text-[9px] text-slate-400 mt-1">12小时血氧恢复正常</div>
+                        </div>
+
+                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
+                            <div class="flex justify-between items-center text-[11px] mb-1">
+                                <span class="text-slate-600 font-medium">🫁 肺部纤毛再生</span>
+                                <span id="med-cilia-val" class="font-extrabold text-emerald-600 tabular-nums">0.0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div id="med-cilia-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="text-[9px] text-slate-400 mt-1">1~9个月呼吸道清洁恢复</div>
+                        </div>
+
+                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
+                            <div class="flex justify-between items-center text-[11px] mb-1">
+                                <span class="text-slate-600 font-medium">🌬️ 肺功能提升</span>
+                                <span id="med-lung-val" class="font-extrabold text-teal-600 tabular-nums">+0.0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div id="med-lung-bar" class="h-full bg-teal-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="text-[9px] text-slate-400 mt-1">2周~3个月最高提升约30%</div>
+                        </div>
+
+                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
+                            <div class="flex justify-between items-center text-[11px] mb-1">
+                                <span class="text-slate-600 font-medium">🌿 气道清净度</span>
+                                <span id="med-airway-val" class="font-extrabold text-amber-600 tabular-nums">0.0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div id="med-airway-bar" class="h-full bg-amber-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="text-[9px] text-slate-400 mt-1">持续无烟气道深层自愈</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 肺部修复阶段性目标明细列表（严格对应树木图鉴 6 大阶段） -->
+                <div id="lung-repair-milestones" class="space-y-3 relative before:content-[''] before:absolute before:left-[15px] before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200"></div>
             </div>
 
         </div>
@@ -590,70 +606,84 @@
                 <div class="w-8 h-7 rounded-xl bg-emerald-50 flex items-center justify-center">
                     <span class="text-sm">🌱</span>
                 </div>
-                <span class="text-[11px] font-bold">培育树苗</span>
+                <span class="text-[11px] font-bold">生命之树</span>
             </button>
 
             <button onclick="switchTab('forest')" id="nav-btn-forest" class="flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-600 transition flex-1 relative py-1">
                 <div class="w-8 h-7 rounded-xl flex items-center justify-center">
                     <span class="text-sm">🌳</span>
                 </div>
-                <span class="text-[11px] font-medium">生命森林</span>
+                <span class="text-[11px] font-medium">森林与图鉴</span>
                 <span id="nav-forest-dot" class="hidden absolute top-0.5 right-6 w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
             </button>
 
             <button onclick="switchTab('milestones')" id="nav-btn-milestones" class="flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-600 transition flex-1 py-1">
                 <div class="w-8 h-7 rounded-xl flex items-center justify-center">
-                    <span class="text-sm">🩺</span>
+                    <span class="text-sm">🫁</span>
                 </div>
-                <span class="text-[11px] font-medium">医学恢复</span>
+                <span class="text-[11px] font-medium">肺部修复</span>
             </button>
         </div>
     </div>
 
-    <!-- ==================== 弹窗 1：存到手机浏览器书签 / 主屏幕指引 ==================== -->
-    <div id="modal-bookmark-tip" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
-        <div class="bg-white rounded-3xl w-full p-5 shadow-2xl border border-emerald-100">
-            <div class="flex items-center justify-between mb-2">
-                <h3 class="text-base font-extrabold text-slate-800">📲 存到手机浏览器或主屏幕</h3>
-                <button onclick="closeBookmarkTipModal()" class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">✕</button>
+    <!-- ==================== 弹窗 0：树木图鉴预览 Modal（支持已解锁与未解锁树种预览） ==================== -->
+    <div id="modal-species-preview" class="absolute inset-0 bg-slate-900/65 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
+        <div class="bg-gradient-to-b from-emerald-50/90 via-white to-white rounded-3xl w-full p-5 text-center shadow-2xl border border-emerald-200 relative">
+            <button onclick="closeSpeciesPreviewModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-700 flex items-center justify-center text-sm font-bold">✕</button>
+            <div class="flex items-center justify-center gap-1.5 mb-2 flex-wrap">
+                <span id="sp-preview-badge" class="inline-block px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">图鉴预览</span>
+                <span id="sp-preview-stage-tag" class="inline-block px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-[10px] font-bold">阶段对照</span>
             </div>
-            <p class="text-xs text-slate-500 leading-relaxed mb-3">
-                你的戒烟计时、每日打卡、浇水冷却（每2小时一次，每日3次）和森林进度会自动保存在当前手机浏览器的本地存储中。
-            </p>
-            <div class="bg-emerald-50/80 border border-emerald-100 rounded-2xl p-3 space-y-2 text-xs text-slate-700">
-                <div><strong class="text-emerald-800">1. iPhone Safari：</strong>打开网址后点底部「分享」图标 → 选择「加入书签」或「添加到主屏幕」。</div>
-                <div><strong class="text-emerald-800">2. 安卓 Chrome / 夸克：</strong>点右上角菜单「⋮」→ 选择「添加至书签」或「安装应用 / 添加到主屏幕」。</div>
-            </div>
-            <button onclick="closeBookmarkTipModal()" class="mt-4 w-full py-2.5 rounded-2xl bg-slate-800 text-white text-xs font-bold">知道了</button>
-        </div>
-    </div>
+            <h3 id="sp-preview-title" class="text-lg font-extrabold text-slate-800">树种名称</h3>
+            <p id="sp-preview-lung-headline" class="text-xs font-semibold text-teal-700 mt-1">肺部恢复目标</p>
 
-    <!-- ==================== 弹窗 2：100% 满级解锁第二株新树苗选择 Modal ==================== -->
-    <div id="modal-unlock-tree" class="absolute inset-0 bg-slate-900/65 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl w-full p-5 shadow-2xl border border-emerald-100 max-h-[88vh] flex flex-col">
-            <div class="text-center mb-3">
-                <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-extrabold mb-1.5">
-                    <span>🏆 365天 · 100% 肺部焕新达成</span>
+            <div class="h-44 flex items-center justify-center my-2 rounded-2xl bg-gradient-to-b from-sky-50/80 to-emerald-50/60 border border-emerald-100/80 px-2" id="sp-preview-svg-box"></div>
+
+            <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 text-left space-y-1.5 my-3">
+                <div class="text-[11px] text-slate-600 leading-relaxed" id="sp-preview-desc">树种介绍</div>
+                <div class="text-[11px] text-emerald-800 bg-emerald-50/80 px-2.5 py-1.5 rounded-xl border border-emerald-100 leading-snug" id="sp-preview-lung-desc">
+                    肺部阶段说明
                 </div>
-                <h3 class="text-lg font-extrabold text-slate-800">生命树已参天，开启下一株！</h3>
-                <p class="text-xs text-slate-500 mt-1">上一株大树已永久入驻你的「生命森林」，请选择下一年度要培育的珍稀树种：</p>
+                <div class="text-[10px] text-slate-500 pt-0.5" id="sp-preview-unlock-info">解锁状态</div>
             </div>
-            <div id="species-selector-list" class="space-y-2 overflow-y-auto no-scrollbar py-1 flex-1"></div>
-            <div class="mt-4 flex gap-2.5">
-                <button onclick="closeUnlockNextTreeModal()" class="px-4 py-3 rounded-2xl bg-slate-100 text-slate-600 text-xs font-bold">稍后再说</button>
-                <button onclick="confirmPlantNextTree()" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-bold shadow-lg shadow-emerald-500/25 active:scale-95 transition">
-                    🌱 认领并开启新树苗
+
+            <div class="flex gap-2.5">
+                <button onclick="closeSpeciesPreviewModal()" class="flex-1 py-2.5 rounded-2xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-700 transition">
+                    知道了
+                </button>
+                <button id="sp-preview-action-btn" onclick="applySpeciesFromPreview()" class="hidden flex-1 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
+                    设为当前养育树种
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== 弹窗 3：森林单棵树木详情铭牌 Modal ==================== -->
+    <!-- ==================== 弹窗 1：100% 满级解锁下一阶段树种 Modal ==================== -->
+    <div id="modal-unlock-tree" class="absolute inset-0 bg-slate-900/65 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl w-full p-5 shadow-2xl border border-emerald-100 max-h-[88vh] flex flex-col">
+            <div class="text-center mb-3">
+                <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-extrabold mb-1.5">
+                    <span>🏆 大树长成 · 100% 满级达成</span>
+                </div>
+                <h3 class="text-lg font-extrabold text-slate-800">大树已成林，解锁下一阶段树种！</h3>
+                <p class="text-xs text-slate-500 mt-1">当前大树已永久存入「我的生命森林」，请选择下一株要培育的树种：</p>
+            </div>
+            <div id="species-selector-list" class="space-y-2 overflow-y-auto no-scrollbar py-1 flex-1"></div>
+            <div class="mt-4 flex gap-2.5">
+                <button onclick="closeUnlockNextTreeModal()" class="px-4 py-3 rounded-2xl bg-slate-100 text-slate-600 text-xs font-bold">稍后再说</button>
+                <button onclick="confirmPlantNextTree()" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-bold shadow-lg shadow-emerald-500/25 active:scale-95 transition">
+                    🌱 种下新树苗并继续
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 弹窗 2：森林单棵树木详情铭牌 Modal ==================== -->
     <div id="modal-tree-plaque" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
         <div class="bg-gradient-to-b from-emerald-50 via-white to-white rounded-3xl w-full p-5 text-center shadow-2xl border border-emerald-200 relative">
             <button onclick="closeTreePlaqueModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm font-bold">✕</button>
             <div id="plaque-badge" class="inline-block px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold mb-2">第 1 株 · 已成林</div>
-            <h3 id="plaque-title" class="text-lg font-extrabold text-slate-800">希望白桦</h3>
+            <h3 id="plaque-title" class="text-lg font-extrabold text-slate-800">希望香樟</h3>
             <p id="plaque-subtitle" class="text-[11px] text-slate-400 mt-0.5">认领于 2026-11-23</p>
             <div id="plaque-svg-box" class="h-36 flex items-center justify-center my-2"></div>
             <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 grid grid-cols-3 gap-2 text-center my-3">
@@ -663,11 +693,11 @@
                 </div>
                 <div>
                     <div class="text-[10px] text-slate-400">少吸香烟</div>
-                    <div id="plaque-cigs" class="text-sm font-extrabold text-emerald-600">5,475 支</div>
+                    <div id="plaque-cigs" class="text-sm font-extrabold text-emerald-600">7,300 支</div>
                 </div>
                 <div>
-                    <div class="text-[10px] text-slate-400">节省资金</div>
-                    <div id="plaque-money" class="text-sm font-extrabold text-amber-600">¥6,843</div>
+                    <div class="text-[10px] text-slate-400">省下金额</div>
+                    <div id="plaque-money" class="text-sm font-extrabold text-amber-600">¥9,125</div>
                 </div>
             </div>
             <p id="plaque-desc" class="text-xs text-slate-600 italic leading-relaxed mb-4">
@@ -677,27 +707,33 @@
         </div>
     </div>
 
-    <!-- ==================== 弹窗 4：烟瘾深呼吸急救 Modal ==================== -->
+    <!-- ==================== 弹窗 3：60秒烟瘾深呼吸急救 Modal ==================== -->
     <div id="modal-craving" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
         <div class="bg-white rounded-3xl w-full p-6 text-center shadow-2xl relative overflow-hidden">
             <button onclick="closeCravingModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm font-bold">✕</button>
-            <div class="inline-block px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold mb-2">烟瘾渴求通常只持续 60 秒</div>
-            <h3 class="text-lg font-bold text-slate-800">跟随光圈深呼吸</h3>
-            <p id="breath-guide-text" class="text-xs text-slate-500 mt-1">用鼻腔缓缓吸气，感受纯净氧气进入肺泡…</p>
-            <div class="my-7 relative h-36 flex items-center justify-center">
-                <div class="w-32 h-32 rounded-full bg-emerald-400/25 breath-circle absolute"></div>
-                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex flex-col items-center justify-center text-white shadow-lg relative z-10">
+            <div class="inline-block px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold mb-2">60秒节律呼吸 · 击退烟瘾渴求</div>
+            <h3 class="text-lg font-bold text-slate-800">跟随圆环呼吸节奏</h3>
+            <p id="breath-guide-text" class="text-xs text-slate-500 mt-1">用鼻腔缓缓吸气 4 秒，让清新空气充满肺部…</p>
+
+            <div class="my-6 relative h-40 flex items-center justify-center">
+                <div id="breath-halo-el" class="w-36 h-36 rounded-full bg-emerald-400/20 breath-halo absolute"></div>
+                <div id="breath-orb-el" class="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex flex-col items-center justify-center text-white shadow-lg relative z-10 breath-orb">
                     <span id="breath-countdown" class="text-2xl font-extrabold tabular-nums">60</span>
-                    <span id="breath-phase" class="text-[11px] font-medium mt-0.5">吸气...</span>
+                    <span id="breath-phase" class="text-[11px] font-bold mt-0.5">吸气 (4s)</span>
                 </div>
             </div>
-            <button onclick="completeCravingEarly()" class="w-full py-3 rounded-2xl bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
-                我已克制住！获赠额外清泉并跳过冷却
+
+            <div class="bg-amber-50/80 border border-amber-200/70 rounded-2xl p-2.5 text-[11px] text-amber-900 mb-3.5 leading-snug">
+                完成急救奖励：<strong>清零当前 2 小时浇水冷却</strong> 并 <strong>额外奖励 1 次急救甘露</strong>（即使今日常规 3 次已满也可额外使用 1 次，树苗养分 +0.5 天效）。
+            </div>
+
+            <button onclick="completeCravingReward()" class="w-full py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
+                完成急救 · 领取清泉奖励
             </button>
         </div>
     </div>
 
-    <!-- ==================== 弹窗 5：每日打卡成功鼓励卡片 ==================== -->
+    <!-- ==================== 弹窗 4：每日无烟打卡成功 Modal ==================== -->
     <div id="modal-checkin" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
         <div class="bg-gradient-to-b from-emerald-50 to-white rounded-3xl w-full p-6 text-center shadow-2xl border border-emerald-100">
             <div class="w-14 h-14 rounded-2xl bg-emerald-500 text-white text-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-emerald-500/30">
@@ -706,31 +742,50 @@
             <div class="text-xs font-bold text-emerald-600 uppercase tracking-wider">DAILY CHECK-IN</div>
             <h3 class="text-xl font-extrabold text-slate-800 mt-1">今日无烟打卡成功！</h3>
             <p id="checkin-quote" class="text-xs text-slate-600 mt-2.5 leading-relaxed bg-white p-3 rounded-2xl border border-emerald-100/80 italic">
-                “你拒绝的不是一支烟，而是对身体的慢性消耗。”
+                “你拒绝的不是一支烟，而是对肺部与血管的慢性消耗。”
             </p>
             <div class="mt-4 flex justify-center gap-3 text-xs">
-                <div class="bg-amber-50 px-3 py-1.5 rounded-xl text-amber-700 font-bold">☀️ 成长加速 +1.5天</div>
+                <div class="bg-amber-50 px-3 py-1.5 rounded-xl text-amber-700 font-bold">🌱 养分加速 +1.5天</div>
                 <div class="bg-emerald-50 px-3 py-1.5 rounded-xl text-emerald-700 font-bold">🔥 连签 <span id="modal-streak-num">1</span> 天</div>
             </div>
             <button onclick="closeCheckinModal()" class="mt-5 w-full py-3 rounded-2xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-700 transition">
-                继续守护小树苗
+                继续守护生命树
             </button>
         </div>
     </div>
 
-    <!-- ==================== 弹窗 6：重置确认弹窗 ==================== -->
+    <!-- ==================== 弹窗 5：复吸严重后果确认 Modal ==================== -->
+    <div id="modal-relapse" class="absolute inset-0 bg-slate-900/65 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
+        <div class="bg-white rounded-3xl w-full p-5 text-center shadow-2xl border border-rose-200">
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 text-xl flex items-center justify-center mx-auto mb-2">
+                ⚠️
+            </div>
+            <h3 class="text-base font-extrabold text-rose-700">确定要记录复吸吗？</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed bg-rose-50/70 p-3 rounded-2xl border border-rose-100 text-left">
+                确认复吸后：<br>
+                1. 当前小树将<strong>退回起点状态</strong>；<br>
+                2. <strong>累计无烟时长、连续打卡、浇水记录、急救甘露与已成林进度将被全部清空</strong>，重新从第 1 天算起。
+            </p>
+            <div class="mt-4 grid grid-cols-2 gap-2.5">
+                <button onclick="closeRelapseModal()" class="py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">我再忍一忍</button>
+                <button onclick="confirmRelapse()" class="py-2.5 rounded-xl bg-rose-600 text-white text-xs font-bold shadow-md shadow-rose-600/20">确认复吸并清零</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 弹窗 6：重设评估确认 Modal ==================== -->
     <div id="modal-reset" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
         <div class="bg-white rounded-3xl w-full p-5 text-center shadow-2xl">
             <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 text-xl flex items-center justify-center mx-auto mb-2">
                 🔄
             </div>
-            <h3 class="text-base font-bold text-slate-800">重新设置烟龄与烟量？</h3>
+            <h3 class="text-base font-bold text-slate-800">重新填写烟龄与日吸烟量？</h3>
             <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                返回初始评估页可以重新输入不同的烟龄与每日吸烟量，清空当前森林存档并重新开始体验。
+                将返回初始评估页重新输入烟龄与日吸烟量，并清空当前本地戒烟记录与森林存档。
             </p>
             <div class="mt-5 grid grid-cols-2 gap-2.5">
                 <button onclick="closeResetModal()" class="py-2.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold">取消</button>
-                <button onclick="confirmResetApp()" class="py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold shadow-md shadow-rose-500/20">重新评估</button>
+                <button onclick="confirmResetApp()" class="py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold shadow-md shadow-rose-500/20">确认重设</button>
             </div>
         </div>
     </div>
@@ -743,52 +798,125 @@
 </div>
 
 <script>
-    // ==================== 全局状态与科学模型配置 ====================
-    const STORAGE_KEY = 'senhuxi_mobile_web_v1';
-    const DAYS_PER_TREE = 365; // 每株树苗满级周期：365天（1年）
-    const DAILY_WATER_MAX = 3; // 每日基础浇水上限：3次
-    const WATER_COOLDOWN_MS = 2 * 60 * 60 * 1000; // 每次浇水冷却时间：2小时
+    const STORAGE_KEY = 'senhuxi_life_tree_v4';
+    const DAILY_WATER_BASE_MAX = 3;
+    const WATER_COOLDOWN_MS = 2 * 60 * 60 * 1000;
 
-    const TREE_SPECIES = [
+    // 6大树种成林周期（阶梯设计：首棵 7 天即可长成，避免一年太久无成就感）+ 肺部生理对照（明确分离，不误导“20分钟养成大树”）
+    const LUNG_AND_TREE_STAGES = [
         {
-            id: 'birch',
-            name: '希望白桦',
-            tag: '第1年基础树种',
+            id: 'camphor',
+            stageNum: 1,
+            matureDays: 7,
+            lungMilestoneMins: 20,
+            lungMilestoneLabel: '肺部起步 · 20分钟稳压降频',
+            lungTitle: '气道刺激减轻，心率血压开始回落',
+            lungDesc: '停止吸烟 20 分钟后心率血压回落；养育满 7 天即可让这株希望香樟长成完整大树并解锁首波花草与彩蝶。',
+            name: '希望香樟',
+            badge: '第1阶段 · 新手友好树种',
+            ecoRewardText: '成林后解锁：野花灌木 + 彩蝶',
+            unlockConditionText: '初始自带树种（成林需 7 天）',
+            unlockTreeCount: 0,
             crownColors: ['#16a34a', '#22c55e', '#4ade80'],
             trunkColor: '#6d4c33',
             flowerColor: '#ffffff',
-            fruitColor: '#f43f5e',
-            desc: '洁白坚韧的树干象征重新洁净的呼吸道，陪伴你走过戒烟最关键的第一年。'
+            fruitColor: '#34d399',
+            desc: '生长周期短、最易带来第一份成林成就感，常绿挺拔、自带清香。'
+        },
+        {
+            id: 'birch',
+            stageNum: 2,
+            matureDays: 21,
+            lungMilestoneMins: 720,
+            lungMilestoneLabel: '肺部对照 · 12小时血氧回升',
+            lungTitle: '血液一氧化碳下降，血氧恢复正常',
+            lungDesc: '戒烟 12 小时后血氧回升；养育满 21 天可让雪域白桦长成大树，并解锁溪流、蜜蜂与林间小鹿。',
+            name: '雪域白桦',
+            badge: '第2阶段 · 进阶树种',
+            ecoRewardText: '成林后解锁：蜜蜂蜻蜓 + 溪流与小鹿',
+            unlockConditionText: '累计成林 1 棵解锁（成林需 14 天）',
+            unlockTreeCount: 1,
+            crownColors: ['#059669', '#34d399', '#a7f3d0'],
+            trunkColor: '#cbd5e1',
+            flowerColor: '#ffffff',
+            fruitColor: '#10b981',
+            desc: '洁白树干象征血液携氧恢复洁净，养育周期适中，适合第二株进阶培育。'
+        },
+        {
+            id: 'bamboo',
+            stageNum: 3,
+            matureDays: 30,
+            lungMilestoneMins: 2880,
+            lungMilestoneLabel: '肺部对照 · 48小时感官苏醒',
+            lungTitle: '尼古丁代谢清除，味觉嗅觉改善',
+            lungDesc: '戒烟 48 小时后嗅觉味觉苏醒；养育满 30 天可让清风翠竹长成成片翠林，进一步丰富森林生态。',
+            name: '清风翠竹',
+            badge: '第3阶段 · 气道清风树种',
+            ecoRewardText: '成林后解锁：林间木屋 + 绚丽彩虹',
+            unlockConditionText: '累计成林 1 棵解锁（成林需 21 天）',
+            unlockTreeCount: 1,
+            crownColors: ['#15803d', '#22c55e', '#86efac'],
+            trunkColor: '#4d7c0f',
+            flowerColor: '#ecfccb',
+            fruitColor: '#84cc16',
+            desc: '节节高升、风过叶清，三周成林陪伴你度过戒烟初期最关键的习惯重塑期。'
         },
         {
             id: 'sakura',
+            stageNum: 4,
+            matureDays: 60,
+            lungMilestoneMins: 20160,
+            lungMilestoneLabel: '肺部对照 · 2周~3个月肺活提升',
+            lungTitle: '肺功能最高提升约 30%，运动更轻松',
+            lungDesc: '2 周至 3 个月肺活量逐步提升；养育满 60 天可让治愈樱花树盛开成林，点亮繁花与灵动生态。',
             name: '治愈樱花树',
-            tag: '第2年解锁珍稀',
-            crownColors: ['#f472b6', '#f9a8d4', '#fbcfe8'],
+            badge: '第4阶段 · 繁花树种',
+            ecoRewardText: '成林后解锁：繁花簇拥 + 生态伙伴',
+            unlockConditionText: '累计成林 2 棵解锁（成林需 30 天）',
+            unlockTreeCount: 2,
+            crownColors: ['#ec4899', '#f472b6', '#fbcfe8'],
             trunkColor: '#5c3d28',
             flowerColor: '#fff1f2',
             fruitColor: '#fb7185',
-            desc: '满树烂漫樱花，象征你的嗅觉与味觉全面苏醒，呼吸间尽是春天的芬芳。'
+            desc: '满树花开象征肺活量舒展与心情愉悦，30 天成林带来满满仪式感。'
         },
         {
             id: 'fir',
+            stageNum: 5,
+            matureDays: 90,
+            lungMilestoneMins: 129600,
+            lungMilestoneLabel: '肺部对照 · 1~9个月纤毛再生',
+            lungTitle: '肺部纤毛再生，咳嗽与气短减轻',
+            lungDesc: '1 至 9 个月气道纤毛逐步再生；养育满 90 天可让雪域冷杉长成参天古木，守护深层呼吸健康。',
             name: '雪域冷杉',
-            tag: '高海拔常青木',
+            badge: '第5阶段 · 常青古树',
+            ecoRewardText: '成林后解锁：常青古木 + 完整生态圈',
+            unlockConditionText: '累计成林 2 棵解锁（成林需 60 天）',
+            unlockTreeCount: 2,
             crownColors: ['#0f766e', '#0d9488', '#2dd4bf'],
             trunkColor: '#4a3525',
             flowerColor: '#fef08a',
             fruitColor: '#f59e0b',
-            desc: '四季常青的苍翠冷杉，代表你强大的自律意志与充沛强劲的心肺耐力。'
+            desc: '常青挺立代表呼吸道防线重建，60 天长成参天大树。'
         },
         {
             id: 'ginkgo',
+            stageNum: 6,
+            matureDays: 150,
+            lungMilestoneMins: 525600,
+            lungMilestoneLabel: '肺部对照 · 长期深层自愈',
+            lungTitle: '心肺长期风险显著降低 · 荣耀成林',
+            lungDesc: '长期无烟让心肺风险持续降低；养育满 150 天可让黄金银杏满冠成林，成为森林中的荣耀地标。',
             name: '黄金银杏',
-            tag: '长寿生命之树',
+            badge: '第6阶段 · 荣耀金树',
+            ecoRewardText: '成林后解锁：金叶满冠 + 秘境地标',
+            unlockConditionText: '累计成林 3 棵解锁（成林需 90 天）',
+            unlockTreeCount: 3,
             crownColors: ['#d97706', '#f59e0b', '#fbbf24'],
             trunkColor: '#5c4033',
             flowerColor: '#fef9c3',
             fruitColor: '#ea580c',
-            desc: '灿若暖阳的金色树冠，见证你远离烟草危害、重获长寿与健康的辉煌里程碑。'
+            desc: '金叶满冠象征长期无烟的丰硕收获，90 天成林见证你的坚定毅力。'
         }
     ];
 
@@ -799,7 +927,7 @@
             minPct: 0,
             bgGradient: 'from-stone-200 via-amber-50/70 to-stone-100',
             badgeClass: 'bg-rose-100 text-rose-800',
-            mood: '“好干渴…土壤都裂开了，快用清新空气救救我…”'
+            mood: '“好干渴…土壤都裂开了，快用无烟空气唤醒我吧…”'
         },
         {
             id: 2,
@@ -807,7 +935,7 @@
             minPct: 15,
             bgGradient: 'from-amber-50 via-lime-50/70 to-emerald-50/60',
             badgeClass: 'bg-amber-100 text-amber-800',
-            mood: '“尼古丁正在排出！我的枝头冒出了一点新绿~”'
+            mood: '“血氧与气道正在改善！枝头冒出了第一抹新绿~”'
         },
         {
             id: 3,
@@ -815,7 +943,7 @@
             minPct: 35,
             bgGradient: 'from-sky-50 via-emerald-50/80 to-teal-50/70',
             badgeClass: 'bg-emerald-100 text-emerald-800',
-            mood: '“肺活量在提升！我的树干越来越挺拔有力了！”'
+            mood: '“肺活量与循环在变好！我的树干越来越挺拔！”'
         },
         {
             id: 4,
@@ -823,7 +951,7 @@
             minPct: 65,
             bgGradient: 'from-sky-100/80 via-emerald-50 to-amber-50/60',
             badgeClass: 'bg-teal-100 text-teal-800',
-            mood: '“肺部纤毛重新长出来啦，树冠开出了美丽的花！”'
+            mood: '“肺部纤毛逐步再生，树冠开出了花朵引来彩蝶！”'
         },
         {
             id: 5,
@@ -831,72 +959,27 @@
             minPct: 95,
             bgGradient: 'from-amber-100/75 via-emerald-100/75 to-sky-100/85',
             badgeClass: 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white',
-            mood: '“心肺功能趋近全面焕新！即将长成参天大树入驻森林！”'
-        }
-    ];
-
-    const CLINICAL_TIMELINE = [
-        {
-            mins: 20,
-            label: '20 分钟',
-            title: '心率与血压开始回落',
-            treeLink: '树苗根系重新吸水',
-            desc: '停止吸烟仅20分钟，因尼古丁引起的末梢血管收缩开始缓解，过快的心率与升高的血压逐渐恢复正常。'
-        },
-        {
-            mins: 720,
-            label: '12 小时',
-            title: '血液一氧化碳浓度恢复正常',
-            treeLink: '枯黄叶片停止凋落',
-            desc: '12小时后，血液中有毒的一氧化碳水平降至正常值，血红蛋白携氧能力恢复，大脑与心肌获得充足氧气。'
-        },
-        {
-            mins: 2880,
-            label: '48 小时',
-            title: '尼古丁基本排出，嗅觉与味觉苏醒',
-            treeLink: '枝头抽出第一抹嫩芽',
-            desc: '48小时后，体内残余尼古丁几乎完全代谢排出，受损的嗅觉和味觉神经末梢开始再生，食物变得更香甜。'
-        },
-        {
-            mins: 20160,
-            label: '2 周 ~ 3 个月',
-            title: '肺功能最高提升 30%，循环显著改善',
-            treeLink: '树冠舒展、枝叶繁茂',
-            desc: '血液循环大幅改善，步行与运动更加轻松；肺活量与肺功能最高可提升 30%，呼吸不再沉重。'
-        },
-        {
-            mins: 129600,
-            label: '1 ~ 9 个月',
-            title: '肺部纤毛再生，咳嗽与气短大幅减少',
-            treeLink: '树冠盛开花朵引来彩蝶',
-            desc: '肺部支气管内微小的纤毛结构重新生长，恢复清扫焦油黏液与抵御感染的能力，晨起咳嗽和气短明显消失。'
-        },
-        {
-            mins: 525600,
-            label: '1 年 (365天)',
-            title: '冠心病风险降至吸烟者一半 · 100%阶段满级',
-            treeLink: '长成参天生命树并结出金果',
-            desc: '坚持戒烟满1年！冠心病额外风险比吸烟者降低 50%，呼吸系统微环境全面焕新，解锁下一株生命树苗！'
+            mood: '“即将达成 100% 满级恢复！准备入驻生命森林并解锁新树种！”'
         }
     ];
 
     const ENCOURAGE_QUOTES = [
-        "你拒绝的不是一支烟，而是对身体的慢性伤害。",
+        "你拒绝的不是一支烟，而是对肺部纤毛与呼吸道的慢性消耗。",
         "每一次深呼吸，都是给生命树苗输送最纯净的氧气。",
-        "烟瘾渴求只是大脑短暂的习惯回响，熬过60秒你就赢了！",
+        "烟瘾渴求只是短暂的生理信号，熬过 60 秒你就赢了！",
         "省下的每一分钱、多出的每一口清新空气，都在奖励未来的你。",
-        "坚持满365天，这棵大树将永远挺立在你的生命森林中！"
+        "坚持养育至 100% 满级成林，这棵大树将永远挺立在你的生命森林中，并带来新的生态伙伴！"
     ];
 
     let appState = null;
     let timerInterval = null;
     let breathInterval = null;
     let breathSecondsLeft = 60;
-    let selectedNextSpeciesId = 'sakura';
+    let selectedNextSpeciesId = 'birch';
     let lastRenderedStageId = null;
     let lastRenderedSpeciesId = null;
+    let previewingSpeciesId = null;
 
-    // ==================== 初始化与本地存储 ====================
     function initApp() {
         updateClock();
         setInterval(updateClock, 30000);
@@ -905,7 +988,7 @@
         if (saved) {
             try {
                 appState = JSON.parse(saved);
-                if (!appState.forestTrees) appState.forestTrees = [];
+                if (!Array.isArray(appState.forestTrees)) appState.forestTrees = [];
                 if (!appState.watering) {
                     appState.watering = {
                         dateStr: new Date().toDateString(),
@@ -917,7 +1000,7 @@
                 if (!appState.currentTree) {
                     appState.currentTree = {
                         index: 1,
-                        speciesId: 'birch',
+                        speciesId: 'camphor',
                         startTime: appState.totalStartTime || Date.now(),
                         waterBonusDays: 0,
                         waterCount: 0
@@ -926,8 +1009,8 @@
                 ensureDailyWaterReset();
                 showMainView();
                 return;
-            } catch (e) {
-                console.error('解析本地存档失败', e);
+            } catch (err) {
+                console.error('读取本地存档失败：', err);
             }
         }
         showOnboardingView();
@@ -960,47 +1043,72 @@
         if (el) el.textContent = `${hh}:${mm}`;
     }
 
-    // ==================== 1. 初始评估页 ====================
-    function calculateInitialHealthStart(years, cigsPerDay) {
-        const damage = (years * 1.1) + (cigsPerDay * 0.95);
-        const startPct = Math.max(2, Math.min(25, Math.round(28 - damage * 0.32)));
-        return startPct;
+    // ==================== 1. 初始评估页（4档初始树苗预览） ====================
+    function evaluateSmokingImpact(years, cigsPerDay) {
+        const rawScore = (years * 1.45) + (cigsPerDay * 1.25);
+        const damageIndex = Math.max(8, Math.min(98, Math.round(rawScore)));
+        const startRecoveryPct = Math.max(4, Math.min(28, Math.round(30 - damageIndex * 0.25)));
+        return { damageIndex, startRecoveryPct };
+    }
+
+    function getOnboardingSeedTier(damageIndex) {
+        if (damageIndex >= 65) {
+            return {
+                tier: 1,
+                badge: '焦枯残苗 · 重度烟损',
+                badgeClass: 'bg-rose-100 text-rose-700',
+                desc: '“主干偏焦褐、叶片稀少萎垂，需要立刻戒烟让它慢慢缓过来。”'
+            };
+        }
+        if (damageIndex >= 42) {
+            return {
+                tier: 2,
+                badge: '灰黄弱苗 · 中度烟损',
+                badgeClass: 'bg-amber-100 text-amber-800',
+                desc: '“芽叶偏暗黄、枝条单薄，坚持无烟后会逐步返青长出新叶。”'
+            };
+        }
+        if (damageIndex >= 22) {
+            return {
+                tier: 3,
+                badge: '微绿待长苗 · 轻度烟损',
+                badgeClass: 'bg-lime-100 text-lime-800',
+                desc: '“带着浅绿新芽与嫩枝，只要守住不复吸就能稳步抽枝发叶。”'
+            };
+        }
+        return {
+            tier: 4,
+            badge: '翠绿初生苗 · 早期烟损',
+            badgeClass: 'bg-emerald-100 text-emerald-700',
+            desc: '“根系尚存活力、初露青翠叶片，及早戒烟更容易快速茁壮。”'
+        };
+    }
+
+    function renderOnboardingSeedTierSVG(tier) {
+        // 统一使用与主舞台相同的希望香樟树苗矢量，确保评估预览与认领后的树苗形象完全一致
+        const stageId = tier >= 4 ? 2 : 1;
+        return `<div class="h-32 w-full flex items-center justify-center scale-90">${generateTreeSVG(stageId, 'camphor')}</div>`;
     }
 
     function updateOnboardingPreview() {
-        const years = parseInt(document.getElementById('input-years').value) || 1;
-        const cigs = parseInt(document.getElementById('input-cigs').value) || 1;
+        const years = parseInt(document.getElementById('input-years').value, 10) || 1;
+        const cigs = parseInt(document.getElementById('input-cigs').value, 10) || 1;
 
         document.getElementById('val-years').textContent = years;
         document.getElementById('val-cigs').textContent = cigs;
 
-        const startPct = calculateInitialHealthStart(years, cigs);
-        document.getElementById('preview-health-start').textContent = `${startPct.toFixed(1)}%`;
-        document.getElementById('preview-health-bar').style.width = `${startPct}%`;
+        const { damageIndex, startRecoveryPct } = evaluateSmokingImpact(years, cigs);
+        const tierInfo = getOnboardingSeedTier(damageIndex);
+
+        document.getElementById('preview-damage-index').textContent = `${damageIndex} / 100`;
+        document.getElementById('preview-damage-bar').style.width = `${damageIndex}%`;
+        document.getElementById('preview-health-start').textContent = `${startRecoveryPct.toFixed(1)}%`;
 
         const badge = document.getElementById('preview-status-badge');
-        const desc = document.getElementById('preview-desc');
-        const previewContainer = document.getElementById('onboarding-tree-preview');
-
-        let previewStage = 1;
-        if (startPct <= 12) {
-            badge.textContent = '重度濒危 · 奄奄一息';
-            badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700';
-            desc.textContent = '“长年的浓烟让树苗叶片焦黄卷曲、土壤干裂，呼吸微弱，急需你立刻开启无烟拯救！”';
-            previewStage = 1;
-        } else if (startPct <= 22) {
-            badge.textContent = '中度萎靡 · 枯黄缺水';
-            badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800';
-            desc.textContent = '“烟雾遮挡了阳光，树苗叶片发黄低垂、无精打采，只要开始戒烟就能逐步复苏。”';
-            previewStage = 1;
-        } else {
-            badge.textContent = '轻度受损 · 亟待舒展';
-            badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-lime-100 text-lime-800';
-            desc.textContent = '“你的烟龄较短，树苗还保留着一丝微弱绿意，坚持365天即可让它长成参天大树！”';
-            previewStage = 2;
-        }
-
-        previewContainer.innerHTML = generateTreeSVG(previewStage, 'birch');
+        badge.textContent = tierInfo.badge;
+        badge.className = `px-2.5 py-0.5 rounded-full text-xs font-bold ${tierInfo.badgeClass}`;
+        document.getElementById('preview-desc').textContent = tierInfo.desc;
+        document.getElementById('onboarding-tree-preview').innerHTML = renderOnboardingSeedTierSVG(tierInfo.tier);
     }
 
     function showOnboardingView() {
@@ -1008,24 +1116,30 @@
         document.getElementById('view-main').classList.add('hidden');
         document.getElementById('view-onboarding').classList.remove('hidden');
         document.getElementById('btn-reset-top').classList.add('hidden');
+        document.getElementById('btn-relapse-top').classList.add('hidden');
         updateOnboardingPreview();
     }
 
     function claimTreeAndStart() {
-        const years = parseInt(document.getElementById('input-years').value) || 5;
-        const cigs = parseInt(document.getElementById('input-cigs').value) || 15;
+        const years = parseInt(document.getElementById('input-years').value, 10) || 8;
+        const cigs = parseInt(document.getElementById('input-cigs').value, 10) || 20;
         const price = parseFloat(document.getElementById('input-price').value) || 25;
-        const startPct = calculateInitialHealthStart(years, cigs);
+        const { damageIndex, startRecoveryPct } = evaluateSmokingImpact(years, cigs);
 
         const now = Date.now();
+        const tierInfo = getOnboardingSeedTier(damageIndex);
+        // 若预览为 tier 4（翠绿初生苗），初始恢复度确保达到嫩芽门槛(15%)，与预览保持一致
+        const syncedInitialPct = tierInfo.tier === 4 ? Math.max(15, startRecoveryPct) : Math.min(14.5, startRecoveryPct);
         appState = {
             smokeYears: years,
             cigsPerDay: cigs,
             packPrice: price,
-            initialHealthPct: startPct,
+            damageIndex: damageIndex,
+            initialHealthPct: syncedInitialPct,
             totalStartTime: now,
             streakDays: 0,
             lastCheckInDate: null,
+            relapseCount: 0,
             watering: {
                 dateStr: new Date().toDateString(),
                 todayCount: 0,
@@ -1035,7 +1149,7 @@
             forestTrees: [],
             currentTree: {
                 index: 1,
-                speciesId: 'birch',
+                speciesId: 'camphor',
                 startTime: now,
                 waterBonusDays: 0,
                 waterCount: 0
@@ -1044,29 +1158,35 @@
 
         saveState();
         showMainView();
-        showToast('🌱 已认领第 1 株生命树苗「希望白桦」，进度已自动保存');
+        showToast('🌱 已认领生命树「希望香樟」，戒烟计时已启动');
     }
 
-    // ==================== 2. 科学恢复度与数据计算 ====================
+    // ==================== 2. 戒烟时长、肺部修复进度与恢复度计算 ====================
     function getTotalQuitSeconds() {
-        const realSec = Math.floor((Date.now() - appState.totalStartTime) / 1000);
-        return Math.max(0, realSec);
+        if (!appState || !appState.totalStartTime) return 0;
+        return Math.max(0, Math.floor((Date.now() - appState.totalStartTime) / 1000));
     }
 
     function getCurrentTreeEffectiveDays() {
+        if (!appState || !appState.currentTree) return 0;
         const ct = appState.currentTree;
-        const realSec = Math.floor((Date.now() - ct.startTime) / 1000);
-        const elapsedDays = Math.max(0, realSec) / 86400;
-        return elapsedDays + (ct.waterBonusDays || 0);
+        const elapsedSec = Math.max(0, Math.floor((Date.now() - ct.startTime) / 1000));
+        return (elapsedSec / 86400) + (ct.waterBonusDays || 0);
+    }
+
+    function getCurrentTreeMatureDays() {
+        if (!appState || !appState.currentTree) return 7;
+        const sp = getSpeciesById(appState.currentTree.speciesId);
+        return sp.matureDays || 7;
     }
 
     function getCurrentTreeRecoveryPct() {
         const effDays = getCurrentTreeEffectiveDays();
-        const basePct = appState.currentTree.index > 1 ? 25 : appState.initialHealthPct;
-        const progressRatio = Math.min(1, effDays / DAYS_PER_TREE);
-        const easedRatio = Math.pow(progressRatio, 0.88);
-        const pct = basePct + (100 - basePct) * easedRatio;
-        return Math.min(100, Number(pct.toFixed(1)));
+        const matureDays = getCurrentTreeMatureDays();
+        const basePct = appState.currentTree.index > 1 ? 18 : Math.min(20, appState.initialHealthPct);
+        const ratio = Math.min(1, effDays / matureDays);
+        const eased = Math.pow(ratio, 0.88);
+        return Math.min(100, Number((basePct + (100 - basePct) * eased).toFixed(1)));
     }
 
     function getVisualStageByPct(pct) {
@@ -1079,14 +1199,24 @@
     }
 
     function getSpeciesById(id) {
-        return TREE_SPECIES.find(s => s.id === id) || TREE_SPECIES[0];
+        return LUNG_AND_TREE_STAGES.find(s => s.id === id) || LUNG_AND_TREE_STAGES[0];
     }
 
-    // ==================== 3. 主界面渲染与实时更新 ====================
+    // 树木图鉴解锁状态：按成林数量解锁（首棵树种默认解锁，其余按成林进度阶梯解锁，避免“20分钟误导成树”）
+    function isSpeciesUnlocked(species) {
+        if (species.stageNum === 1) return true;
+        const matureCount = (appState.forestTrees || []).length;
+        return matureCount >= species.unlockTreeCount;
+    }
+
+    // ==================== 3. 主界面渲染与实时时钟刷新 ====================
     function showMainView() {
         document.getElementById('view-onboarding').classList.add('hidden');
         document.getElementById('view-main').classList.remove('hidden');
         document.getElementById('btn-reset-top').classList.remove('hidden');
+        document.getElementById('btn-relapse-top').classList.remove('hidden');
+
+        document.getElementById('user-baseline-summary').textContent = `烟龄 ${appState.smokeYears}年 · ${appState.cigsPerDay}支/天`;
 
         renderAllMainData();
         if (timerInterval) clearInterval(timerInterval);
@@ -1097,11 +1227,12 @@
         updateRealtimeStats();
         updateTreeVisuals(true);
         updateActionButtons();
-        renderClinicalTimeline();
+        renderLungRepairView();
         renderForestView();
     }
 
     function updateRealtimeStats() {
+        if (!appState) return;
         if (ensureDailyWaterReset()) {
             updateActionButtons();
         } else {
@@ -1132,31 +1263,37 @@
             ? `${(lifeSavedMins / 1440).toFixed(1)}天`
             : `${lifeSavedMins}分`;
 
+        // 肺部修复指标实时刷新
         const coPct = Math.min(100, Math.round((totalMins / 720) * 100));
-        document.getElementById('med-co-val').textContent = `${coPct}%`;
-        document.getElementById('med-co-bar').style.width = `${coPct}%`;
-
         const ciliaPct = Math.min(100, Number(((totalDays / 270) * 100).toFixed(1)));
-        document.getElementById('med-cilia-val').textContent = `${ciliaPct.toFixed(1)}%`;
-        document.getElementById('med-cilia-bar').style.width = `${ciliaPct}%`;
-
         const lungBoost = Math.min(30, Number(((totalDays / 90) * 30).toFixed(1)));
-        document.getElementById('med-lung-val').textContent = `+${lungBoost.toFixed(1)}%`;
-        document.getElementById('med-lung-bar').style.width = `${(lungBoost / 30) * 100}%`;
+        const airwayPct = Math.min(100, Number(((totalDays / 365) * 100).toFixed(1)));
 
-        const heartDrop = Math.min(50, Number(((totalDays / 365) * 50).toFixed(1)));
-        document.getElementById('med-heart-val').textContent = `-${heartDrop.toFixed(1)}%`;
-        document.getElementById('med-heart-bar').style.width = `${(heartDrop / 50) * 100}%`;
+        const coEl = document.getElementById('med-co-val');
+        if (coEl) {
+            coEl.textContent = `${coPct}%`;
+            document.getElementById('med-co-bar').style.width = `${coPct}%`;
+            document.getElementById('med-cilia-val').textContent = `${ciliaPct.toFixed(1)}%`;
+            document.getElementById('med-cilia-bar').style.width = `${ciliaPct}%`;
+            document.getElementById('med-lung-val').textContent = `+${lungBoost.toFixed(1)}%`;
+            document.getElementById('med-lung-bar').style.width = `${(lungBoost / 30) * 100}%`;
+            document.getElementById('med-airway-val').textContent = `${airwayPct.toFixed(1)}%`;
+            document.getElementById('med-airway-bar').style.width = `${airwayPct}%`;
 
-        let currentClinical = CLINICAL_TIMELINE[0];
-        for (let i = CLINICAL_TIMELINE.length - 1; i >= 0; i--) {
-            if (totalMins >= CLINICAL_TIMELINE[i].mins) {
-                currentClinical = CLINICAL_TIMELINE[i];
-                break;
+            const overallLungPct = Math.min(100, Number(((coPct * 0.2) + (ciliaPct * 0.35) + ((lungBoost / 30) * 25) + (airwayPct * 0.2)).toFixed(1)));
+            document.getElementById('lung-overall-badge').textContent = `${overallLungPct.toFixed(1)}%`;
+            document.getElementById('lung-total-pct-text').textContent = `${overallLungPct.toFixed(1)}%`;
+
+            let currentStage = LUNG_AND_TREE_STAGES[0];
+            for (let i = LUNG_AND_TREE_STAGES.length - 1; i >= 0; i--) {
+                if (totalMins >= LUNG_AND_TREE_STAGES[i].mins) {
+                    currentStage = LUNG_AND_TREE_STAGES[i];
+                    break;
+                }
             }
+            document.getElementById('lung-stage-headline').textContent = `肺部阶段 · ${currentStage.lungTargetLabel}`;
+            document.getElementById('lung-stage-summary').textContent = currentStage.lungDesc;
         }
-        document.getElementById('clinical-stage-title').textContent = `当前医学节点 [${currentClinical.label}]：${currentClinical.title}`;
-        document.getElementById('clinical-stage-desc').textContent = currentClinical.desc;
     }
 
     function updateTreeVisuals(forceReRender = false) {
@@ -1164,10 +1301,11 @@
         const species = getSpeciesById(ct.speciesId);
         const pct = getCurrentTreeRecoveryPct();
         const stage = getVisualStageByPct(pct);
-        const effDays = Math.min(DAYS_PER_TREE, getCurrentTreeEffectiveDays());
+        const matureDays = getCurrentTreeMatureDays();
+        const effDays = Math.min(matureDays, getCurrentTreeEffectiveDays());
 
         document.getElementById('tree-order-pill').textContent = `第 ${ct.index} 株 · ${species.name}`;
-        
+
         const stageBg = document.getElementById('tree-stage-bg');
         stageBg.className = `relative rounded-3xl p-4 transition-all duration-700 overflow-hidden border border-white/70 shadow-sm bg-gradient-to-b ${stage.bgGradient}`;
 
@@ -1178,8 +1316,8 @@
         document.getElementById('tree-recovery-pct-badge').textContent = `${pct.toFixed(1)}%`;
         document.getElementById('tree-mood-text').textContent = stage.mood;
 
-        document.getElementById('tree-days-progress-text').textContent = `${effDays.toFixed(1)} / ${DAYS_PER_TREE} 天`;
-        document.getElementById('tree-water-bonus-text').textContent = `甘露加速 +${(ct.waterBonusDays || 0).toFixed(1)}天`;
+        document.getElementById('tree-days-progress-text').textContent = `${Math.min(matureDays, effDays).toFixed(1)} / ${matureDays} 天成林`;
+        document.getElementById('tree-water-bonus-text').textContent = `养分加速 +${(ct.waterBonusDays || 0).toFixed(1)}天`;
         document.getElementById('total-water-lifetime').textContent = `本株浇水 ${ct.waterCount || 0} 次`;
         document.getElementById('stage-progress-bar').style.width = `${pct}%`;
 
@@ -1205,6 +1343,7 @@
         }
     }
 
+    // ==================== 4. 每日打卡、浇水与急救奖励 ====================
     function updateActionButtons() {
         ensureDailyWaterReset();
         const todayStr = new Date().toDateString();
@@ -1213,17 +1352,17 @@
         const btnCheckin = document.getElementById('btn-checkin');
         const titleEl = document.getElementById('checkin-title');
         const subEl = document.getElementById('checkin-sub');
-        document.getElementById('streak-badge').textContent = `已连签 ${appState.streakDays} 天`;
+        document.getElementById('streak-badge').textContent = `连签 ${appState.streakDays} 天`;
 
         if (isCheckedToday) {
             btnCheckin.className = 'p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex flex-col justify-between text-left transition';
             titleEl.textContent = '今日已打卡 ✓';
-            subEl.textContent = '阳光已洒满树冠';
+            subEl.textContent = '今日养分已领取';
             subEl.className = 'text-[11px] text-emerald-600 mt-0.5';
         } else {
             btnCheckin.className = 'p-3.5 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 flex flex-col justify-between text-left transition active:scale-[0.97]';
-            titleEl.textContent = '今日戒烟打卡';
-            subEl.textContent = '加速树苗生长 (+1.5天效)';
+            titleEl.textContent = '每日无烟打卡';
+            subEl.textContent = '增加养分 (+1.5天效)';
             subEl.className = 'text-[11px] text-emerald-100 mt-0.5';
         }
 
@@ -1241,19 +1380,24 @@
     function getWateringStatus() {
         ensureDailyWaterReset();
         const w = appState.watering;
-        const maxToday = DAILY_WATER_MAX + (w.bonusQuota || 0);
-        const usedToday = w.todayCount || 0;
-        const remainingQuota = Math.max(0, maxToday - usedToday);
+        const baseUsed = Math.min(DAILY_WATER_BASE_MAX, w.todayCount || 0);
+        const bonusTotal = w.bonusQuota || 0;
+        const bonusUsed = Math.max(0, (w.todayCount || 0) - DAILY_WATER_BASE_MAX);
+        const bonusRemaining = Math.max(0, bonusTotal - bonusUsed);
+
+        const baseRemaining = Math.max(0, DAILY_WATER_BASE_MAX - (w.todayCount || 0));
+        const totalRemaining = baseRemaining + bonusRemaining;
 
         const now = Date.now();
-        const elapsedSinceLast = now - (w.lastWaterTimestamp || 0);
-        const cooldownRemainingMs = w.lastWaterTimestamp > 0 ? Math.max(0, WATER_COOLDOWN_MS - elapsedSinceLast) : 0;
+        const elapsed = now - (w.lastWaterTimestamp || 0);
+        const cooldownRemainingMs = w.lastWaterTimestamp > 0 ? Math.max(0, WATER_COOLDOWN_MS - elapsed) : 0;
 
         return {
-            usedToday,
-            maxToday,
-            remainingQuota,
-            isMaxedOut: remainingQuota <= 0,
+            baseUsed,
+            bonusTotal,
+            bonusRemaining,
+            totalRemaining,
+            isAtDailyCap: totalRemaining <= 0,
             isCoolingDown: cooldownRemainingMs > 0,
             cooldownRemainingMs
         };
@@ -1269,15 +1413,19 @@
 
         if (!btnWater) return;
 
-        badgeEl.textContent = `今日甘露 ${status.usedToday}/${status.maxToday}`;
+        if (status.bonusRemaining > 0) {
+            badgeEl.textContent = `今日甘露 ${status.baseUsed}/3 · 急救+${status.bonusRemaining}`;
+        } else {
+            badgeEl.textContent = `今日甘露 ${status.baseUsed}/${DAILY_WATER_BASE_MAX}`;
+        }
 
-        if (status.isMaxedOut) {
+        if (status.isAtDailyCap) {
             btnWater.className = 'p-3.5 rounded-2xl bg-slate-100 border border-slate-200 text-slate-500 flex flex-col justify-between text-left transition cursor-not-allowed';
             iconEl.className = 'w-8 h-8 rounded-xl bg-slate-200/80 flex items-center justify-center text-base';
             iconEl.textContent = '🌙';
             badgeEl.className = 'text-[10px] font-bold bg-slate-200/80 text-slate-600 px-2 py-0.5 rounded-full tabular-nums';
             titleEl.textContent = '今日已饱饮';
-            subEl.textContent = '明日0点恢复甘露额度';
+            subEl.textContent = '过量浇水会伤根';
             subEl.className = 'text-[11px] text-slate-400 mt-0.5';
         } else if (status.isCoolingDown) {
             btnWater.className = 'p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 flex flex-col justify-between text-left transition cursor-not-allowed';
@@ -1292,17 +1440,16 @@
             iconEl.className = 'w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-base';
             iconEl.textContent = '💧';
             badgeEl.className = 'text-[10px] font-bold bg-black/15 text-white px-2 py-0.5 rounded-full tabular-nums';
-            titleEl.textContent = '给树苗浇水';
-            subEl.textContent = '甘露滋润 (+0.5天效)';
+            titleEl.textContent = status.bonusRemaining > 0 ? '使用急救甘露' : '给树苗浇水';
+            subEl.textContent = status.bonusRemaining > 0 ? '额外清泉滋润 (+0.5天效)' : '滋润根系 (+0.5天效)';
             subEl.className = 'text-[11px] text-sky-100 mt-0.5';
         }
     }
 
-    // ==================== 4. 打卡、浇水与解锁新树种 ====================
     function dailyCheckIn() {
         const todayStr = new Date().toDateString();
         if (appState.lastCheckInDate === todayStr) {
-            showToast('☀️ 今天已经打过卡啦，明天继续加油！');
+            showToast('☀️ 今天已经无烟打卡啦，明天继续坚持！');
             triggerTreeHappyBounce();
             return;
         }
@@ -1333,13 +1480,13 @@
     function waterTree() {
         const status = getWateringStatus();
 
-        if (status.isMaxedOut) {
-            showToast(`🌙 今日甘露已达上限 (${status.usedToday}/${status.maxToday})，过量浇水会伤根哦~`);
+        if (status.isAtDailyCap) {
+            showToast('🌙 今日已饱饮，过量浇水会伤根');
             return;
         }
 
         if (status.isCoolingDown) {
-            showToast(`⏳ 树苗正在吸收上一份水分，请 ${formatCooldownHMS(status.cooldownRemainingMs)} 后再来`);
+            showToast(`⏳ 树苗正在吸收水分，请 ${formatCooldownHMS(status.cooldownRemainingMs)} 后再浇`);
             return;
         }
 
@@ -1356,21 +1503,17 @@
         updateTreeVisuals();
         renderForestView();
 
-        const nextStatus = getWateringStatus();
         if (!checkNewlyMatured(prevPct)) {
-            if (nextStatus.isMaxedOut) {
-                showToast(`💧 浇水成功！今日甘露已全部滋润 (${nextStatus.usedToday}/${nextStatus.maxToday})`);
-            } else {
-                showToast(`💧 浇水成功！恢复加速 +0.5天，下次浇水需间隔 2 小时`);
-            }
+            showToast('💧 浇水成功！恢复加速 +0.5天，2 小时后可再次浇水');
         }
     }
 
+    // ==================== 5. 满级解锁与丰富树木图鉴 ====================
     function checkNewlyMatured(prevPct) {
         const newPct = getCurrentTreeRecoveryPct();
         if (prevPct < 100 && newPct >= 100) {
             triggerTreeHappyBounce();
-            showToast('🎉 恭喜！本株生命树达成 100% 肺部焕新满级！');
+            showToast('🎉 恭喜！本株生命树达成 100% 满级恢复！');
             setTimeout(() => {
                 openUnlockNextTreeModal();
             }, 650);
@@ -1385,8 +1528,8 @@
             ...appState.forestTrees.map(t => t.speciesId),
             appState.currentTree.speciesId
         ];
-        const unplanted = TREE_SPECIES.find(s => !usedIds.includes(s.id));
-        selectedNextSpeciesId = unplanted ? unplanted.id : TREE_SPECIES[(nextIndex - 1) % TREE_SPECIES.length].id;
+        const unplanted = LUNG_AND_TREE_STAGES.find(s => !usedIds.includes(s.id));
+        selectedNextSpeciesId = unplanted ? unplanted.id : LUNG_AND_TREE_STAGES[(nextIndex - 1) % LUNG_AND_TREE_STAGES.length].id;
 
         renderSpeciesSelector();
         document.getElementById('modal-unlock-tree').classList.remove('hidden');
@@ -1398,21 +1541,21 @@
 
     function renderSpeciesSelector() {
         const listEl = document.getElementById('species-selector-list');
-        listEl.innerHTML = TREE_SPECIES.map(sp => {
+        listEl.innerHTML = LUNG_AND_TREE_STAGES.map(sp => {
             const isSelected = sp.id === selectedNextSpeciesId;
             return `
                 <div onclick="selectNextSpecies('${sp.id}')" class="p-3 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
-                    isSelected 
-                        ? 'border-emerald-500 bg-emerald-50/70 shadow-xs' 
+                    isSelected
+                        ? 'border-emerald-500 bg-emerald-50/70 shadow-xs'
                         : 'border-slate-100 bg-slate-50/60 hover:bg-white'
                 }">
                     <div class="w-14 h-14 rounded-xl bg-white border border-slate-100 flex items-center justify-center shrink-0">
                         ${generateTreeSVG(5, sp.id)}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1.5 flex-wrap">
                             <span class="text-xs font-extrabold text-slate-800">${sp.name}</span>
-                            <span class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[9px] font-semibold text-slate-500">${sp.tag}</span>
+                            <span class="px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-[9px] font-bold text-emerald-700">${sp.lungTargetLabel}</span>
                         </div>
                         <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">${sp.desc}</p>
                     </div>
@@ -1434,8 +1577,8 @@
     function confirmPlantNextTree() {
         const ct = appState.currentTree;
         const species = getSpeciesById(ct.speciesId);
-
-        const cigsSavedThisTree = Math.round(DAYS_PER_TREE * appState.cigsPerDay);
+        const doneMatureDays = species.matureDays || 7;
+        const cigsSavedThisTree = Math.round(doneMatureDays * appState.cigsPerDay);
         const moneySavedThisTree = Math.round((cigsSavedThisTree / 20) * appState.packPrice);
 
         appState.forestTrees.push({
@@ -1444,7 +1587,7 @@
             speciesName: species.name,
             plantedDate: new Date(ct.startTime).toLocaleDateString('zh-CN'),
             completedDate: new Date().toLocaleDateString('zh-CN'),
-            daysGuarded: DAYS_PER_TREE,
+            daysGuarded: species.matureDays || 7,
             cigsAvoided: cigsSavedThisTree,
             moneySaved: moneySavedThisTree
         });
@@ -1466,43 +1609,71 @@
         updateTreeVisuals(true);
         renderForestView();
 
-        showToast(`🌳 第${ct.index}棵大树已入驻森林！第${nextIndex}株「${nextSpecies.name}」已种下！`);
+        showToast(`🌳 第${ct.index}棵大树已存入生命森林！第${nextIndex}株「${nextSpecies.name}」已种下`);
     }
 
-    // ==================== 5. 「我的生命森林」全景渲染 ====================
+    function switchCurrentSpecies(speciesId) {
+        const sp = getSpeciesById(speciesId);
+        if (!isSpeciesUnlocked(sp)) {
+            showToast(`🔒 尚未解锁「${sp.name}」，达成 ${sp.lungTargetLabel} 肺部阶段或对应成林进度即可点亮`);
+            return;
+        }
+        appState.currentTree.speciesId = speciesId;
+        saveState();
+        updateTreeVisuals(true);
+        renderForestView();
+        showToast(`🌱 已将当前养育树种切换为「${sp.name}」`);
+    }
+
     function renderForestView() {
         const matureTrees = appState.forestTrees || [];
         const currentTree = appState.currentTree;
         const currentPct = getCurrentTreeRecoveryPct();
         const currentStage = getVisualStageByPct(currentPct);
+        const unlockedSpecies = LUNG_AND_TREE_STAGES.filter(s => isSpeciesUnlocked(s));
 
         document.getElementById('forest-mature-count').textContent = matureTrees.length;
+        document.getElementById('forest-atlas-count').textContent = unlockedSpecies.length;
+        document.getElementById('atlas-progress-pill').textContent = `${unlockedSpecies.length}/${LUNG_AND_TREE_STAGES.length} 已解锁`;
 
         const levelBadge = document.getElementById('forest-level-badge');
         const ecoText = document.getElementById('forest-eco-text');
+        const ecoStatusPill = document.getElementById('eco-stage-status-pill');
         const eco1 = document.getElementById('eco-card-1');
         const eco2 = document.getElementById('eco-card-2');
         const eco3 = document.getElementById('eco-card-3');
 
-        if (matureTrees.length >= 2) {
+        const activeEco1 = matureTrees.length >= 1;
+        const activeEco2 = matureTrees.length >= 2;
+        const activeEco3 = matureTrees.length >= 3;
+
+        if (activeEco3) {
             levelBadge.textContent = '彩虹秘境森林';
-            ecoText.textContent = '木屋 · 彩虹 · 灵鹿 · 溪流';
-            eco1.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
-            eco2.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
-            eco3.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
-        } else if (matureTrees.length >= 1) {
+            ecoText.textContent = '木屋 · 彩虹 · 灵鹿 · 昆虫花草';
+            ecoStatusPill.textContent = '已解锁全部 3 阶生态';
+        } else if (activeEco2) {
             levelBadge.textContent = '灵鹿溪谷森林';
-            ecoText.textContent = '溪流 · 林间小鹿 · 蝴蝶';
-            eco1.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
-            eco2.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
-            eco3.className = 'p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-60';
+            ecoText.textContent = '小鹿 · 溪流 · 蜜蜂花草';
+            ecoStatusPill.textContent = '已解锁第 1~2 阶生态';
+        } else if (activeEco1) {
+            levelBadge.textContent = '初绽花蝶草甸';
+            ecoText.textContent = '野花灌木 · 彩蝶飞舞';
+            ecoStatusPill.textContent = '已解锁第 1 阶生态';
         } else {
-            levelBadge.textContent = '初生希望草甸';
-            ecoText.textContent = '阳光草地 · 蝴蝶';
-            eco1.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
-            eco2.className = 'p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-60';
-            eco3.className = 'p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-60';
+            levelBadge.textContent = '待成林空地';
+            ecoText.textContent = '首棵树成林后解锁生态';
+            ecoStatusPill.textContent = '树木长成后解锁生态';
         }
+
+        eco1.className = activeEco1
+            ? 'p-2.5 rounded-2xl border bg-emerald-50/80 border-emerald-200 transition'
+            : 'p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-65 transition';
+        eco2.className = activeEco2
+            ? 'p-2.5 rounded-2xl border bg-emerald-50/80 border-emerald-200 transition'
+            : 'p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-65 transition';
+        eco3.className = activeEco3
+            ? 'p-2.5 rounded-2xl border bg-emerald-50/80 border-emerald-200 transition'
+            : 'p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-65 transition';
 
         const allDisplayTrees = [
             ...matureTrees.map(t => ({
@@ -1529,14 +1700,28 @@
             { x: 245, y: 258, scale: 0.75 }
         ];
 
-        const rainbowSvg = matureTrees.length >= 2 ? `
-            <path d="M30 160 A 160 120 0 0 1 350 160" fill="none" stroke="#f43f5e" stroke-width="5" opacity="0.28"/>
-            <path d="M36 160 A 154 114 0 0 1 344 160" fill="none" stroke="#fbbf24" stroke-width="5" opacity="0.28"/>
-            <path d="M42 160 A 148 108 0 0 1 338 160" fill="none" stroke="#34d399" stroke-width="5" opacity="0.28"/>
-            <path d="M48 160 A 142 102 0 0 1 332 160" fill="none" stroke="#38bdf8" stroke-width="5" opacity="0.28"/>
+        const plantsAndButterfliesSvg = activeEco1 ? `
+            <g>
+                <circle cx="48" cy="246" r="10" fill="#16a34a" opacity="0.75"/>
+                <circle cx="60" cy="249" r="8" fill="#22c55e" opacity="0.75"/>
+                <circle cx="44" cy="242" r="3" fill="#f472b6"/>
+                <circle cx="56" cy="244" r="3" fill="#facc15"/>
+                <circle cx="328" cy="245" r="11" fill="#15803d" opacity="0.75"/>
+                <circle cx="316" cy="249" r="8" fill="#4ade80" opacity="0.75"/>
+                <circle cx="324" cy="241" r="3" fill="#fb7185"/>
+                <circle cx="335" cy="244" r="3" fill="#fde047"/>
+            </g>
+            <g class="butterfly-float" transform="translate(150, 145)">
+                <path d="M0 0 Q-6 -6 -8 0 Q-6 5 0 1.5 Z" fill="#f472b6"/>
+                <path d="M0 0 Q6 -6 8 0 Q6 5 0 1.5 Z" fill="#fb7185"/>
+            </g>
+            <g class="butterfly-float" transform="translate(225, 132)">
+                <path d="M0 0 Q-5 -5 -7 0 Q-5 4 0 1.2 Z" fill="#38bdf8"/>
+                <path d="M0 0 Q5 -5 7 0 Q5 4 0 1.2 Z" fill="#60a5fa"/>
+            </g>
         ` : '';
 
-        const streamSvg = matureTrees.length >= 1 ? `
+        const streamDeerAndBeesSvg = activeEco2 ? `
             <path d="M0 245 Q110 230 185 262 T380 285 L380 310 L0 310 Z" fill="#7dd3fc" opacity="0.65"/>
             <path d="M20 255 Q110 242 175 268" stroke="#e0f2fe" stroke-width="2.5" stroke-linecap="round" fill="none"/>
             <g transform="translate(52, 212)">
@@ -1547,9 +1732,18 @@
                 <path d="M7 -3 L5 -8 M9 -3 L11 -8" stroke="#78350f" stroke-width="1.3" stroke-linecap="round"/>
                 <circle cx="9.5" cy="0.5" r="0.8" fill="#1e293b"/>
             </g>
+            <g class="butterfly-float" transform="translate(192, 118)">
+                <ellipse cx="0" cy="0" rx="4.5" ry="3" fill="#facc15"/>
+                <line x1="-1" y1="-3" x2="-1" y2="3" stroke="#1e293b" stroke-width="1.2"/>
+                <line x1="1.5" y1="-3" x2="1.5" y2="3" stroke="#1e293b" stroke-width="1.2"/>
+            </g>
         ` : '';
 
-        const cabinSvg = matureTrees.length >= 2 ? `
+        const cabinAndRainbowSvg = activeEco3 ? `
+            <path d="M30 160 A 160 120 0 0 1 350 160" fill="none" stroke="#f43f5e" stroke-width="5" opacity="0.28"/>
+            <path d="M36 160 A 154 114 0 0 1 344 160" fill="none" stroke="#fbbf24" stroke-width="5" opacity="0.28"/>
+            <path d="M42 160 A 148 108 0 0 1 338 160" fill="none" stroke="#34d399" stroke-width="5" opacity="0.28"/>
+            <path d="M48 160 A 142 102 0 0 1 332 160" fill="none" stroke="#38bdf8" stroke-width="5" opacity="0.28"/>
             <g transform="translate(318, 152)">
                 <rect x="-14" y="0" width="28" height="20" rx="2" fill="#fef3c7" stroke="#92400e" stroke-width="1.5"/>
                 <polygon points="-18,0 0,-14 18,0" fill="#ea580c"/>
@@ -1584,20 +1778,63 @@
                 <g class="cloud-float" fill="#ffffff" opacity="0.85">
                     <circle cx="75" cy="52" r="14"/><circle cx="92" cy="48" r="18"/><circle cx="110" cy="53" r="13"/>
                 </g>
-                ${rainbowSvg}
+                ${cabinAndRainbowSvg}
                 <path d="M-20 175 Q85 110 190 170 T400 165 L400 310 L-20 310 Z" fill="#86efac" opacity="0.65"/>
                 <path d="M-20 195 Q130 140 250 185 T400 180 L400 310 L-20 310 Z" fill="#4ade80" opacity="0.75"/>
                 <path d="M-20 210 Q190 175 400 215 L400 310 L-20 310 Z" fill="#22c55e" opacity="0.35"/>
-                ${streamSvg}
-                ${cabinSvg}
-                <g class="butterfly-float" transform="translate(150, 145)">
-                    <path d="M0 0 Q-6 -6 -8 0 Q-6 5 0 1.5 Z" fill="#f472b6"/>
-                    <path d="M0 0 Q6 -6 8 0 Q6 5 0 1.5 Z" fill="#fb7185"/>
-                </g>
+                ${streamDeerAndBeesSvg}
+                ${plantsAndButterfliesSvg}
                 ${treesInPanorama}
             </svg>
         `;
 
+        // 渲染与肺部恢复阶段对齐的丰富树木图鉴（已解锁与未解锁均可预览）
+        const atlasEl = document.getElementById('species-atlas-list');
+        atlasEl.innerHTML = LUNG_AND_TREE_STAGES.map(sp => {
+            const unlocked = isSpeciesUnlocked(sp);
+            const isCurrent = currentTree.speciesId === sp.id;
+            const thumbSvg = unlocked
+                ? generateTreeSVG(4, sp.id)
+                : generateLockedSpeciesPreviewSVG(sp.id);
+
+            return `
+                <div class="p-3 rounded-2xl border transition flex items-start gap-3 ${
+                    unlocked ? 'bg-emerald-50/45 border-emerald-200/80' : 'bg-slate-50/90 border-slate-200/70'
+                }">
+                    <button type="button" onclick="openSpeciesPreviewModal('${sp.id}')" title="点击查看${sp.name}预览" class="w-14 h-14 rounded-xl bg-white border ${
+                        unlocked ? 'border-emerald-100' : 'border-slate-200/80'
+                    } flex items-center justify-center shrink-0 relative overflow-hidden active:scale-95 transition">
+                        ${thumbSvg}
+                        ${!unlocked ? '<span class="absolute bottom-0 inset-x-0 bg-slate-800/75 text-white text-[8px] font-bold text-center py-0.5 leading-tight">🔒 预览</span>' : ''}
+                    </button>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-1.5 flex-wrap">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-xs font-extrabold text-slate-800">${sp.name}</span>
+                                <span class="px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-[9px] font-bold text-emerald-700">成林需 ${sp.matureDays} 天</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="openSpeciesPreviewModal('${sp.id}')" class="px-2 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 hover:bg-sky-100 text-[9px] font-bold transition">
+                                    预览
+                                </button>
+                                ${
+                                    isCurrent
+                                        ? '<span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-bold">当前养育中</span>'
+                                        : unlocked
+                                            ? `<button type="button" onclick="switchCurrentSpecies('${sp.id}')" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 hover:bg-emerald-200 text-[9px] font-bold transition">设为当前树种</button>`
+                                            : '<span class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 text-[9px] font-bold">🔒 未解锁</span>'
+                                }
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-semibold text-teal-700 mt-1">🌿 ${sp.ecoRewardText} · ${sp.lungMilestoneLabel}</div>
+                        <p class="text-[10px] text-slate-500 mt-0.5 leading-snug">${sp.desc}</p>
+                        <div class="text-[9px] text-slate-400 mt-1">${unlocked ? '✓ 图鉴已点亮' : `解锁条件：${sp.unlockConditionText}`}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // 守护档案列表
         const cardsListEl = document.getElementById('forest-tree-cards-list');
         cardsListEl.innerHTML = allDisplayTrees.slice().reverse().map(t => {
             const sp = getSpeciesById(t.speciesId);
@@ -1609,12 +1846,12 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                             <span class="text-xs font-extrabold text-slate-800">第 ${t.index} 株 · ${sp.name}</span>
-                            ${t.isMature 
-                                ? '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">100% 已成林</span>' 
+                            ${t.isMature
+                                ? '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">100% 已成林</span>'
                                 : `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">培育中 ${t.pct.toFixed(1)}%</span>`
                             }
                         </div>
-                        <p class="text-[11px] text-slate-500 mt-0.5 truncate">${sp.desc}</p>
+                        <p class="text-[11px] text-slate-500 mt-0.5 truncate">${sp.lungTargetLabel} · ${sp.desc}</p>
                     </div>
                     <span class="text-slate-300 text-xs">›</span>
                 </div>
@@ -1661,13 +1898,13 @@
         if (mature) {
             speciesId = mature.speciesId;
             title = mature.speciesName;
-            badgeText = `第 ${mature.index} 株 · 100% 满级参天大树`;
+            badgeText = `第 ${mature.index} 株 · 100% 满级大树`;
             subtitle = `认领于 ${mature.plantedDate} · 成林于 ${mature.completedDate}`;
             days = `${mature.daysGuarded} 天`;
             cigs = `${mature.cigsAvoided.toLocaleString()} 支`;
             money = `¥${mature.moneySaved.toLocaleString()}`;
             stageId = 5;
-            desc = `“你用整整一年的坚持唤醒了这棵${mature.speciesName}，它永远守护着你的生命森林。”`;
+            desc = `“你用坚持唤醒了这棵${mature.speciesName}，它永远守护着你的生命森林。”`;
         } else if (isCurrent) {
             const ct = appState.currentTree;
             const sp = getSpeciesById(ct.speciesId);
@@ -1678,7 +1915,7 @@
 
             speciesId = ct.speciesId;
             title = sp.name;
-            badgeText = `第 ${ct.index} 株 · 正在培育 (${pct.toFixed(1)}%)`;
+            badgeText = `第 ${ct.index} 株 · 培育中 (${pct.toFixed(1)}%)`;
             subtitle = `认领于 ${new Date(ct.startTime).toLocaleDateString('zh-CN')}`;
             days = `${effDays.toFixed(1)} 天`;
             cigs = `${cigsNum.toLocaleString()} 支`;
@@ -1705,57 +1942,55 @@
         document.getElementById('modal-tree-plaque').classList.add('hidden');
     }
 
-    // ==================== 6. 医学时间轴渲染 ====================
-    function renderClinicalTimeline() {
+    // ==================== 6. 第三页：肺部修复进度渲染 ====================
+    function renderLungRepairView() {
         const elapsedMins = getTotalQuitSeconds() / 60;
-        const timelineEl = document.getElementById('health-timeline-list');
+        const listEl = document.getElementById('lung-repair-milestones');
+        if (!listEl) return;
 
-        timelineEl.innerHTML = CLINICAL_TIMELINE.map(item => {
-            const achieved = elapsedMins >= item.mins;
-            const progress = Math.min(100, Math.round((elapsedMins / item.mins) * 100));
+        listEl.innerHTML = LUNG_AND_TREE_STAGES.map(item => {
+            const achieved = elapsedMins >= item.lungMilestoneMins;
+            const progress = Math.min(100, Math.round((elapsedMins / item.lungMilestoneMins) * 100));
 
             return `
                 <div class="relative pl-9">
                     <div class="absolute left-0 top-1 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 z-10 ${
-                        achieved 
-                            ? 'bg-emerald-500 border-emerald-200 text-white shadow-xs' 
+                        achieved
+                            ? 'bg-emerald-500 border-emerald-200 text-white shadow-xs'
                             : 'bg-white border-slate-200 text-slate-400'
                     }">
-                        ${achieved ? '✓' : '⏳'}
+                        ${achieved ? '✓' : item.stageNum}
                     </div>
                     <div class="bg-white rounded-2xl p-3.5 border ${achieved ? 'border-emerald-200 shadow-2xs' : 'border-slate-100'}">
                         <div class="flex items-center justify-between gap-2 mb-1">
-                            <span class="text-xs font-extrabold ${achieved ? 'text-slate-800' : 'text-slate-600'}">${item.title}</span>
+                            <span class="text-xs font-extrabold ${achieved ? 'text-slate-800' : 'text-slate-600'}">${item.lungTitle}</span>
                             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
                                 achieved ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'
-                            }">${item.label}</span>
+                            }">${item.lungMilestoneLabel.replace(/^肺部对照 · /, '')}</span>
                         </div>
                         <div class="inline-block text-[10px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md mb-1.5">
-                            🌱 树苗映射：${item.treeLink}
+                            🌳 关联树种：${item.name}（成林需 ${item.matureDays} 天）
                         </div>
-                        <p class="text-[11px] text-slate-500 leading-relaxed">${item.desc}</p>
-                        ${!achieved ? `
-                            <div class="mt-2 flex items-center gap-2">
-                                <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="h-full bg-emerald-400 rounded-full" style="width: ${progress}%"></div>
-                                </div>
-                                <span class="text-[10px] text-slate-400 font-semibold">${progress}%</span>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">${item.lungDesc}</p>
+                        <div class="mt-2 flex items-center gap-2">
+                            <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full ${achieved ? 'bg-emerald-500' : 'bg-emerald-400'} rounded-full" style="width: ${progress}%"></div>
                             </div>
-                        ` : ''}
+                            <span class="text-[10px] text-slate-400 font-semibold tabular-nums">${progress}%</span>
+                        </div>
                     </div>
                 </div>
             `;
         }).join('');
     }
 
-    // ==================== 7. 烟瘾深呼吸急救 & 互动特效 ====================
+    // ==================== 7. 60秒烟瘾深呼吸急救与树苗互动 ====================
     function petTreeInteraction() {
         triggerTreeHappyBounce();
         spawnFallingLeaf();
 
         const bubble = document.getElementById('tree-speech-bubble');
-        const quote = ENCOURAGE_QUOTES[Math.floor(Math.random() * ENCOURAGE_QUOTES.length)];
-        bubble.textContent = quote;
+        bubble.textContent = ENCOURAGE_QUOTES[Math.floor(Math.random() * ENCOURAGE_QUOTES.length)];
         bubble.classList.remove('opacity-0', '-translate-y-1');
         bubble.classList.add('opacity-100', 'translate-y-0');
 
@@ -1802,26 +2037,64 @@
         setTimeout(() => leaf.remove(), 1650);
     }
 
+    function applyBreathPhaseStyle(phase) {
+        const orb = document.getElementById('breath-orb-el');
+        const halo = document.getElementById('breath-halo-el');
+        const phaseEl = document.getElementById('breath-phase');
+        const guideEl = document.getElementById('breath-guide-text');
+
+        if (phase === 'inhale') {
+            orb.style.transform = 'scale(1.24)';
+            halo.style.transform = 'scale(1.32)';
+            halo.style.opacity = '0.85';
+            phaseEl.textContent = '吸气 (4s)';
+            guideEl.textContent = '用鼻腔缓缓吸气 4 秒，让清新空气充满肺部…';
+        } else if (phase === 'holdIn') {
+            orb.style.transform = 'scale(1.24)';
+            halo.style.transform = 'scale(1.32)';
+            halo.style.opacity = '0.95';
+            phaseEl.textContent = '屏息 (4s)';
+            guideEl.textContent = '轻柔屏息 4 秒，感受氧气在血液中温柔流淌…';
+        } else if (phase === 'exhale') {
+            orb.style.transform = 'scale(0.88)';
+            halo.style.transform = 'scale(0.88)';
+            halo.style.opacity = '0.35';
+            phaseEl.textContent = '呼气 (4s)';
+            guideEl.textContent = '双唇微张慢慢呼气 4 秒，把烟瘾紧张感彻底释放…';
+        } else {
+            orb.style.transform = 'scale(0.88)';
+            halo.style.transform = 'scale(0.88)';
+            halo.style.opacity = '0.25';
+            phaseEl.textContent = '屏息 (4s)';
+            guideEl.textContent = '保持放松 4 秒，准备迎接下一轮纯净呼吸…';
+        }
+    }
+
     function openCravingModal() {
         breathSecondsLeft = 60;
         document.getElementById('breath-countdown').textContent = breathSecondsLeft;
         document.getElementById('modal-craving').classList.remove('hidden');
 
+        applyBreathPhaseStyle('inhale');
+
         if (breathInterval) clearInterval(breathInterval);
         breathInterval = setInterval(() => {
             breathSecondsLeft -= 1;
             if (breathSecondsLeft <= 0) {
-                completeCravingEarly();
+                completeCravingReward();
                 return;
             }
             document.getElementById('breath-countdown').textContent = breathSecondsLeft;
-            const cycle = (60 - breathSecondsLeft) % 8;
-            if (cycle < 4) {
-                document.getElementById('breath-phase').textContent = '缓缓吸气...';
-                document.getElementById('breath-guide-text').textContent = '用鼻腔深深吸气，感受纯净氧气充盈肺部…';
+            const elapsed = 60 - breathSecondsLeft;
+            const mod16 = elapsed % 16;
+            if (mod16 < 4) {
+                applyBreathPhaseStyle('inhale');
+            } else if (mod16 < 8) {
+                applyBreathPhaseStyle('holdIn');
+            } else if (mod16 < 12) {
+                applyBreathPhaseStyle('exhale');
             } else {
-                document.getElementById('breath-phase').textContent = '慢慢呼气...';
-                document.getElementById('breath-guide-text').textContent = '放松双肩，把焦虑与烟瘾随着浊气一起呼出…';
+                applyBreathPhaseStyle('holdOut');
             }
         }, 1000);
     }
@@ -1831,16 +2104,13 @@
         document.getElementById('modal-craving').classList.add('hidden');
     }
 
-    function completeCravingEarly() {
+    function completeCravingReward() {
         closeCravingModal();
-        const prevPct = getCurrentTreeRecoveryPct();
-
         ensureDailyWaterReset();
-        const status = getWateringStatus();
-        if (status.isMaxedOut) {
-            appState.watering.bonusQuota = (appState.watering.bonusQuota || 0) + 1;
-        }
+
+        const prevPct = getCurrentTreeRecoveryPct();
         appState.watering.lastWaterTimestamp = 0;
+        appState.watering.bonusQuota = (appState.watering.bonusQuota || 0) + 1;
         appState.currentTree.waterBonusDays += 0.5;
         saveState();
 
@@ -1851,11 +2121,11 @@
         renderForestView();
 
         if (!checkNewlyMatured(prevPct)) {
-            showToast('🌊 成功击退烟瘾！已清零浇水冷却并获赠清泉额度');
+            showToast('🌊 急救完成！已清零冷却并额外奖励 1 次急救甘露');
         }
     }
 
-    // ==================== 8. 导航、书签指引与重设 ====================
+    // ==================== 8. 导航、复吸清零与重设评估 ====================
     function switchTab(tabName) {
         const tabs = ['home', 'forest', 'milestones'];
         document.getElementById('main-scroll-area').scrollTop = 0;
@@ -1877,15 +2147,48 @@
         });
 
         if (tabName === 'forest') renderForestView();
-        if (tabName === 'milestones') renderClinicalTimeline();
+        if (tabName === 'milestones') {
+            renderLungRepairView();
+            updateRealtimeStats();
+        }
     }
 
-    function openBookmarkTipModal() {
-        document.getElementById('modal-bookmark-tip').classList.remove('hidden');
+    function openRelapseModal() {
+        document.getElementById('modal-relapse').classList.remove('hidden');
     }
 
-    function closeBookmarkTipModal() {
-        document.getElementById('modal-bookmark-tip').classList.add('hidden');
+    function closeRelapseModal() {
+        document.getElementById('modal-relapse').classList.add('hidden');
+    }
+
+    function confirmRelapse() {
+        closeRelapseModal();
+        const now = Date.now();
+        appState.totalStartTime = now;
+        appState.streakDays = 0;
+        appState.lastCheckInDate = null;
+        appState.relapseCount = (appState.relapseCount || 0) + 1;
+        appState.forestTrees = [];
+        appState.watering = {
+            dateStr: new Date().toDateString(),
+            todayCount: 0,
+            bonusQuota: 0,
+            lastWaterTimestamp: 0
+        };
+        appState.currentTree = {
+            index: 1,
+            speciesId: 'camphor',
+            startTime: now,
+            waterBonusDays: 0,
+            waterCount: 0
+        };
+
+        saveState();
+        lastRenderedStageId = null;
+        lastRenderedSpeciesId = null;
+        renderAllMainData();
+        switchTab('home');
+        showToast('⚠️ 已记录复吸：小树退回起点，无烟时长、打卡与森林进度已清零');
     }
 
     function openResetModal() {
@@ -1914,11 +2217,77 @@
         window.toastTimer = setTimeout(() => {
             toast.classList.remove('opacity-100');
             toast.classList.add('opacity-0');
-        }, 2500);
+        }, 2600);
     }
 
-    // ==================== 9. 多树种高精矢量 SVG 生成器 ====================
-    function generateTreeSVG(stageId, speciesId = 'birch') {
+    // ==================== 8.5 图鉴树种预览（支持未解锁树种预览） ====================
+    function generateLockedSpeciesPreviewSVG(speciesId) {
+        const sp = getSpeciesById(speciesId);
+        const [cDark, cMid, cLight] = sp.crownColors;
+        return `
+            <svg viewBox="0 0 120 120" class="w-12 h-12 overflow-visible">
+                <circle cx="60" cy="56" r="34" fill="${cLight}" opacity="0.24"/>
+                <rect x="55" y="64" width="10" height="32" rx="3" fill="${sp.trunkColor}" opacity="0.72"/>
+                <circle cx="42" cy="60" r="16" fill="${cDark}" opacity="0.58"/>
+                <circle cx="78" cy="60" r="16" fill="${cDark}" opacity="0.58"/>
+                <circle cx="48" cy="42" r="17" fill="${cMid}" opacity="0.62"/>
+                <circle cx="72" cy="42" r="17" fill="${cMid}" opacity="0.62"/>
+                <circle cx="60" cy="34" r="19" fill="${cLight}" opacity="0.68"/>
+                <circle cx="60" cy="54" r="12" fill="#0f172a" opacity="0.35"/>
+                <text x="60" y="59" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="800">?</text>
+                <ellipse cx="60" cy="98" rx="34" ry="6" fill="#94a3b8" opacity="0.45"/>
+            </svg>
+        `;
+    }
+
+    function openSpeciesPreviewModal(speciesId) {
+        const sp = getSpeciesById(speciesId);
+        const unlocked = isSpeciesUnlocked(sp);
+        const isCurrent = appState && appState.currentTree && appState.currentTree.speciesId === sp.id;
+        previewingSpeciesId = sp.id;
+
+        const badgeEl = document.getElementById('sp-preview-badge');
+        const stageTagEl = document.getElementById('sp-preview-stage-tag');
+        const actionBtn = document.getElementById('sp-preview-action-btn');
+
+        badgeEl.textContent = unlocked ? '已解锁 · 成林形态预览' : '🔒 未解锁 · 抢先形态预览';
+        badgeEl.className = unlocked
+            ? 'inline-block px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold'
+            : 'inline-block px-3 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold';
+
+        stageTagEl.textContent = `${sp.badge} · 成林需 ${sp.matureDays} 天`;
+        document.getElementById('sp-preview-title').textContent = sp.name;
+        document.getElementById('sp-preview-lung-headline').textContent = `🌿 ${sp.ecoRewardText}`;
+        document.getElementById('sp-preview-svg-box').innerHTML = generateTreeSVG(5, sp.id);
+        document.getElementById('sp-preview-desc').textContent = sp.desc;
+        document.getElementById('sp-preview-lung-desc').textContent = `${sp.lungMilestoneLabel}：${sp.lungDesc}`;
+        document.getElementById('sp-preview-unlock-info').textContent = unlocked
+            ? (isCurrent ? `状态：当前正在养育该树种（成林需 ${sp.matureDays} 天）` : `状态：已解锁（成林需 ${sp.matureDays} 天），可直接切换`)
+            : `解锁条件：${sp.unlockConditionText}`;
+
+        if (unlocked && !isCurrent) {
+            actionBtn.classList.remove('hidden');
+        } else {
+            actionBtn.classList.add('hidden');
+        }
+
+        document.getElementById('modal-species-preview').classList.remove('hidden');
+    }
+
+    function closeSpeciesPreviewModal() {
+        previewingSpeciesId = null;
+        document.getElementById('modal-species-preview').classList.add('hidden');
+    }
+
+    function applySpeciesFromPreview() {
+        if (!previewingSpeciesId) return;
+        const targetId = previewingSpeciesId;
+        closeSpeciesPreviewModal();
+        switchCurrentSpecies(targetId);
+    }
+
+    // ==================== 9. 动态 SVG 矢量树苗生成器 ====================
+    function generateTreeSVG(stageId, speciesId = 'camphor') {
         const sp = getSpeciesById(speciesId);
         const [cDark, cMid, cLight] = sp.crownColors;
         const animClass = stageId <= 2 ? 'tree-weak' : 'tree-healthy';
