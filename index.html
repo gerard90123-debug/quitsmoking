@@ -1,902 +1,2077 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>森呼吸 · 生命之树 — 戒烟养成</title>
-<style>
-  :root {
-    --bg: #f3f7f4;
-    --card: #ffffff;
-    --ink: #1b2b22;
-    --muted: #66786e;
-    --green: #2c7a52;
-    --green-soft: #e6f3ec;
-    --amber: #c87d20;
-    --amber-soft: #fdf3e4;
-    --danger: #c44536;
-    --danger-soft: #fbeae7;
-    --border: #e2ebe5;
-    --shadow: 0 8px 24px rgba(27, 43, 34, 0.06);
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    line-height: 1.5;
-  }
-  .app {
-    max-width: 440px;
-    margin: 0 auto;
-    min-height: 100vh;
-    padding: 16px 16px 88px;
-  }
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 18px;
-    box-shadow: var(--shadow);
-    margin-bottom: 14px;
-  }
-  h1 { font-size: 20px; margin: 0 0 4px; font-weight: 700; }
-  h2 { font-size: 16px; margin: 0 0 10px; font-weight: 700; }
-  p.sub { margin: 0; font-size: 13px; color: var(--muted); }
+    <meta charset="UTF-8">
+    <!-- 移动端视口设置：适配 iPhone 刘海/灵动岛并防止双击缩放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- iOS 主屏幕 Web App 独立运行配置 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="森呼吸">
+    <meta name="theme-color" content="#10b981">
+    <title>森呼吸 · 生命之树 - 科学戒烟与生命森林养成</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入中文字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
 
-  /* Onboarding */
-  .field { margin: 16px 0; }
-  .field-head { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-  .field-val { color: var(--green); }
-  input[type="range"] { width: 100%; accent-color: var(--green); height: 6px; cursor: pointer; }
-  .preview-box {
-    background: #f8fbf9;
-    border: 1px dashed #c8dbd0;
-    border-radius: 16px;
-    padding: 14px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin: 14px 0 18px;
-  }
-  .badge {
-    display: inline-block;
-    padding: 3px 9px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-  .badge-danger { background: var(--danger-soft); color: var(--danger); }
-  .badge-amber { background: var(--amber-soft); color: var(--amber); }
-  .badge-green { background: var(--green-soft); color: var(--green); }
+        body {
+            background: linear-gradient(135deg, #e2f1ea 0%, #cce5da 100%);
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
 
-  button {
-    border: none;
-    border-radius: 14px;
-    padding: 12px 14px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.12s ease, opacity 0.2s ease, background 0.2s ease;
-  }
-  button:active:not(:disabled) { transform: scale(0.97); }
-  button:disabled { opacity: 0.55; cursor: not-allowed; }
-  .btn-primary { width: 100%; background: var(--green); color: #fff; }
-  .btn-soft { background: var(--green-soft); color: var(--green); }
-  .btn-amber { background: var(--amber-soft); color: var(--amber); }
-  .btn-ghost { background: #f1f5f2; color: var(--ink); font-size: 12px; padding: 8px 10px; border-radius: 10px; }
+        /* 移动端自适应容器：手机端全屏铺满，桌面端居中呈现代移动视窗 */
+        .mini-app-shell {
+            width: 100%;
+            max-width: 430px;
+            height: 100dvh;
+            max-height: 900px;
+            background-color: #f8fbf9;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(15, 55, 38, 0.22);
+        }
 
-  /* Top stats */
-  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-  .stat {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 12px 10px;
-    text-align: center;
-  }
-  .stat-num { font-size: 18px; font-weight: 700; color: var(--green); }
-  .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+        @media (min-width: 460px) {
+            .mini-app-shell {
+                height: 92dvh;
+                border-radius: 38px;
+                border: 8px solid #ffffff;
+            }
+        }
 
-  /* Tree stage */
-  .stage {
-    background: linear-gradient(180deg, #eef7f1 0%, #f9fcf9 72%, #e7f0e9 100%);
-    border-radius: 18px;
-    padding: 14px 12px 16px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .stage-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .tree-svg-wrap { width: 190px; height: 190px; margin: 4px auto 8px; cursor: pointer; }
-  .tree-svg-wrap.bounce svg { animation: bounceTree 0.45s ease; }
-  @keyframes bounceTree {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.06, 0.95); }
-    75% { transform: scale(0.98, 1.03); }
-    100% { transform: scale(1); }
-  }
-  .droplet-toast {
-    font-size: 12px;
-    color: var(--green);
-    min-height: 18px;
-    font-weight: 600;
-  }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
 
-  /* Progress bar */
-  .progress-track {
-    width: 100%;
-    height: 10px;
-    background: #e5eee8;
-    border-radius: 999px;
-    overflow: hidden;
-    margin: 8px 0 6px;
-  }
-  .progress-fill {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #56ab7c, #2c7a52);
-    border-radius: 999px;
-    transition: width 0.4s ease;
-  }
+        /* 动画定义 */
+        @keyframes breatheWeak {
+            0%, 100% { transform: scaleY(1) rotate(0deg); }
+            50% { transform: scaleY(0.97) rotate(-1.5deg); }
+        }
+        @keyframes swayGentle {
+            0%, 100% { transform: rotate(-1.5deg); }
+            50% { transform: rotate(2deg); }
+        }
+        @keyframes happyBounce {
+            0%, 100% { transform: scale(1, 1) translateY(0); }
+            25% { transform: scale(1.06, 0.94) translateY(3px); }
+            50% { transform: scale(0.96, 1.05) translateY(-6px); }
+            75% { transform: scale(1.02, 0.98) translateY(1px); }
+        }
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-7px) translateX(5px); }
+        }
+        @keyframes cloudDrift {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(12px); }
+        }
+        @keyframes waterDrop {
+            0% { opacity: 1; transform: translateY(-30px) scale(0.8); }
+            70% { opacity: 1; transform: translateY(45px) scale(1); }
+            100% { opacity: 0; transform: translateY(55px) scale(1.3, 0.4); }
+        }
+        @keyframes leafFall {
+            0% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+            100% { opacity: 0; transform: translate(35px, 90px) rotate(160deg); }
+        }
+        @keyframes pulseRing {
+            0% { transform: scale(0.85); opacity: 0.7; }
+            50% { transform: scale(1.35); opacity: 0.25; }
+            100% { transform: scale(0.85); opacity: 0.7; }
+        }
+        @keyframes sunSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.45; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.06); }
+        }
 
-  /* Action row */
-  .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-  .action-btn { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 12px 10px; }
-  .quota-tag {
-    font-size: 11px;
-    padding: 1px 7px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.85);
-    color: var(--ink);
-  }
-  .sub-note { font-size: 11px; opacity: 0.85; font-weight: 500; }
+        .tree-weak {
+            transform-origin: 150px 210px;
+            animation: breatheWeak 3.5s ease-in-out infinite;
+        }
+        .tree-healthy {
+            transform-origin: 150px 210px;
+            animation: swayGentle 4.5s ease-in-out infinite;
+        }
+        .tree-happy {
+            transform-origin: 150px 210px;
+            animation: happyBounce 0.75s ease-in-out;
+        }
+        .butterfly-float {
+            animation: floatSlow 3.2s ease-in-out infinite;
+        }
+        .cloud-float {
+            animation: cloudDrift 7s ease-in-out infinite;
+        }
+        .sun-rays {
+            transform-origin: 245px 55px;
+            animation: sunSpin 28s linear infinite;
+        }
+        .water-drop-anim {
+            animation: waterDrop 0.8s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+        }
+        .falling-leaf-anim {
+            animation: leafFall 1.6s ease-out forwards;
+        }
+        .breath-circle {
+            animation: pulseRing 8s ease-in-out infinite;
+        }
+        .aura-glow {
+            transform-origin: 150px 112px;
+            animation: glowPulse 3.5s ease-in-out infinite;
+        }
 
-  /* Milestones */
-  .milestone-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: #f8fbf9;
-    margin-bottom: 8px;
-    font-size: 13px;
-  }
-  .milestone-item.done { background: var(--green-soft); }
-  .milestone-title { font-weight: 600; }
-  .milestone-desc { font-size: 11px; color: var(--muted); }
-
-  /* Forest */
-  .forest-scene {
-    background: linear-gradient(180deg, #e7f3fb 0%, #eef8f0 55%, #d9ebd9 100%);
-    border-radius: 18px;
-    padding: 16px;
-    min-height: 210px;
-    border: 1px solid #d5e6d9;
-  }
-  .forest-trees {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin: 12px 0;
-  }
-  .forest-tree-card {
-    background: rgba(255,255,255,0.88);
-    border: 1px solid #d7e7dc;
-    border-radius: 14px;
-    padding: 10px;
-    width: 104px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 12px;
-  }
-
-  /* Breath modal */
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(18, 28, 22, 0.55);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 50;
-  }
-  .modal-backdrop.show { display: flex; }
-  .modal-card {
-    background: #fff;
-    border-radius: 22px;
-    padding: 22px;
-    width: 100%;
-    max-width: 360px;
-    text-align: center;
-  }
-  .breath-circle {
-    width: 124px;
-    height: 124px;
-    border-radius: 50%;
-    margin: 16px auto;
-    background: var(--green-soft);
-    border: 3px solid var(--green);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transition: transform 4s ease-in-out, background 0.4s ease;
-  }
-  .breath-circle.expand { transform: scale(1.18); background: #d4ecdf; }
-
-  /* Bottom nav */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 440px;
-    background: rgba(255,255,255,0.96);
-    border-top: 1px solid var(--border);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 8px 16px 12px;
-    gap: 10px;
-    z-index: 20;
-  }
-  .nav-btn { background: transparent; color: var(--muted); padding: 8px; border-radius: 12px; }
-  .nav-btn.active { background: var(--green-soft); color: var(--green); }
-  .disclaimer { font-size: 11px; color: var(--muted); text-align: center; margin-top: 10px; }
-</style>
+        /* 自定义滑块 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #10b981;
+            border: 3px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.45);
+            cursor: pointer;
+            margin-top: -9px;
+            transition: transform 0.15s;
+        }
+        input[type=range]::-webkit-slider-thumb:active {
+            transform: scale(1.15);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 999px;
+        }
+    </style>
 </head>
 <body>
-<div class="app" id="app"></div>
 
-<div class="modal-backdrop" id="breathModal">
-  <div class="modal-card">
-    <h2 id="breathTitle">60 秒烟瘾深呼吸急救</h2>
-    <p class="sub" id="breathTip">吸气 4 秒 · 屏息 2 秒 · 呼气 4 秒，帮大脑渡过渴求波峰</p>
-    <div class="breath-circle" id="breathCircle">
-      <div id="breathPhase" style="font-weight:700;color:var(--green);font-size:15px;">准备</div>
-      <div id="breathSec" style="font-size:22px;font-weight:700;margin-top:2px;">60s</div>
+<div class="mini-app-shell" id="app">
+    <!-- 顶部状态栏与快捷操作 -->
+    <div class="px-5 pt-3 pb-2 flex items-center justify-between text-xs font-medium text-slate-600 z-30 shrink-0 select-none" style="padding-top: max(12px, env(safe-area-inset-top));">
+        <div class="flex items-center gap-1.5">
+            <span id="clock-time" class="font-semibold text-slate-800 tabular-nums">13:15</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">森呼吸 · 生命之树</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+            <button onclick="openBookmarkTipModal()" class="bg-white/90 border border-slate-200/80 text-slate-700 hover:text-emerald-600 rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-2xs transition">
+                📲 存到桌面
+            </button>
+            <button id="btn-reset-top" onclick="openResetModal()" title="重新评估烟龄" class="bg-white/90 border border-slate-200/80 text-slate-600 hover:text-rose-600 rounded-full px-2.5 py-1 flex items-center gap-1 text-[11px] font-medium shadow-2xs transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                <span>重设</span>
+            </button>
+        </div>
     </div>
-    <div style="display:flex;gap:10px;">
-      <button class="btn-ghost" style="flex:1;" onclick="closeBreathModal()">稍后再试</button>
-      <button class="btn-primary" style="flex:1;" id="breathActionBtn" onclick="toggleBreathTimer()">开始呼吸</button>
+
+    <!-- ==================== 页面 1：初始评估页 (Onboarding) ==================== -->
+    <div id="view-onboarding" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-8 pt-1 flex flex-col justify-between hidden">
+        <div>
+            <div class="mt-1 mb-4">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium mb-1.5">
+                    <span>🌱 WHO / NHS 临床戒烟自愈模型</span>
+                </div>
+                <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">种下你的第一株生命树</h1>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">烟龄与烟量决定了树苗的初始受损程度。坚持戒烟 <strong class="text-emerald-700">365 天（1年）</strong> 达成 100% 肺部焕新，即可将参天大树移入「我的生命森林」并解锁第二株新树苗！</p>
+            </div>
+
+            <!-- 实时预览小树苗状态卡片 -->
+            <div id="preview-card" class="rounded-3xl p-4 mb-4 border transition-all duration-500 bg-gradient-to-b from-amber-50/90 to-stone-100 border-amber-200/80 relative overflow-hidden">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-semibold text-slate-600">第 1 株 · 希望白桦（初始状态）</span>
+                    <span id="preview-status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700">濒危枯萎</span>
+                </div>
+
+                <!-- 预览 SVG 容器 -->
+                <div class="h-32 flex items-center justify-center relative" id="onboarding-tree-preview"></div>
+
+                <!-- 初始健康起点与损耗指数条 -->
+                <div class="mt-1 bg-white/85 backdrop-blur-xs rounded-2xl p-3 border border-white">
+                    <div class="flex justify-between items-center text-xs mb-1.5">
+                        <span class="text-slate-600 font-medium">初始心肺健康起点</span>
+                        <span id="preview-health-start" class="font-bold text-rose-600 text-sm tabular-nums">12.0%</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <div id="preview-health-bar" class="h-full bg-gradient-to-r from-rose-500 to-amber-400 rounded-full transition-all duration-300" style="width: 12%"></div>
+                    </div>
+                    <p id="preview-desc" class="text-[11px] text-slate-500 mt-2 leading-snug">
+                        “长期的烟雾让它叶片干枯卷曲、土壤干裂，急需你用无烟的清新空气将它唤醒……”
+                    </p>
+                </div>
+            </div>
+
+            <!-- 输入表单区 -->
+            <div class="space-y-3.5 bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-semibold text-slate-700">⏳ 吸烟年限（烟龄）</label>
+                        <div class="flex items-baseline gap-1">
+                            <span id="val-years" class="text-lg font-bold text-emerald-600 tabular-nums">5</span>
+                            <span class="text-xs text-slate-400">年</span>
+                        </div>
+                    </div>
+                    <input type="range" id="input-years" min="1" max="40" value="5" oninput="updateOnboardingPreview()">
+                    <div class="flex justify-between text-[10px] text-slate-400 mt-0.5">
+                        <span>1年</span>
+                        <span>15年</span>
+                        <span>30年+</span>
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-100">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-semibold text-slate-700">🚬 每日吸烟数量</label>
+                        <div class="flex items-baseline gap-1">
+                            <span id="val-cigs" class="text-lg font-bold text-emerald-600 tabular-nums">15</span>
+                            <span class="text-xs text-slate-400">支/天</span>
+                        </div>
+                    </div>
+                    <input type="range" id="input-cigs" min="1" max="60" value="15" oninput="updateOnboardingPreview()">
+                    <div class="flex justify-between text-[10px] text-slate-400 mt-0.5">
+                        <span>偶尔(1-5支)</span>
+                        <span>一包(20支)</span>
+                        <span>重度(40支+)</span>
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <label for="input-price" class="text-xs font-semibold text-slate-700">💰 每包香烟均价 (20支)</label>
+                    <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 w-28">
+                        <span class="text-xs text-slate-400 mr-1">¥</span>
+                        <input type="number" id="input-price" value="25" min="1" max="500" class="w-full bg-transparent text-sm font-bold text-slate-700 focus:outline-none text-right">
+                        <span class="text-xs text-slate-400 ml-1">元</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="claimTreeAndStart()" class="mt-4 w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 hover:opacity-95 active:scale-[0.98] transition flex items-center justify-center gap-2">
+            <span>🌱 认领第 1 株小树苗，开启戒烟之旅</span>
+        </button>
     </div>
-  </div>
+
+    <!-- ==================== 页面 2：主界面 (培育页 / 生命森林全景页 / 医学恢复页) ==================== -->
+    <div id="view-main" class="flex-1 flex flex-col overflow-hidden hidden">
+        
+        <!-- 主滚动内容区 -->
+        <div id="main-scroll-area" class="flex-1 overflow-y-auto no-scrollbar pb-24">
+            
+            <!-- ==================== TAB 1: 当前树苗培育与实时心肺看板 ==================== -->
+            <div id="tab-home" class="px-4 pt-1 space-y-3.5">
+                
+                <!-- 树苗生态舞台卡片 -->
+                <div id="tree-stage-bg" class="relative rounded-3xl p-4 transition-all duration-700 overflow-hidden border border-white/70 shadow-sm bg-gradient-to-b from-stone-200 via-amber-50/70 to-stone-100">
+                    
+                    <!-- 顶部树种与阶段信息栏 -->
+                    <div class="flex items-start justify-between relative z-10">
+                        <div>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span id="tree-order-pill" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-800/80 text-white">第 1 株 · 希望白桦</span>
+                                <span id="stage-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 shadow-2xs">濒危枯苗</span>
+                            </div>
+                            <p id="tree-mood-text" class="text-xs text-slate-600 mt-1.5 font-medium">“好干渴…快用无烟空气唤醒我的根系吧”</p>
+                        </div>
+
+                        <!-- 100% 满级进度胶囊 -->
+                        <div class="bg-white/90 backdrop-blur-xs rounded-2xl px-2.5 py-1.5 text-right border border-white shadow-2xs shrink-0">
+                            <div class="text-[10px] text-slate-400">本株心肺恢复度</div>
+                            <div id="tree-recovery-pct-badge" class="text-sm font-extrabold text-emerald-600 tabular-nums">12.0%</div>
+                        </div>
+                    </div>
+
+                    <!-- 树苗主画布区域 -->
+                    <div onclick="petTreeInteraction()" class="relative h-52 w-full flex items-center justify-center cursor-pointer my-1" id="main-tree-container">
+                        <!-- 互动提示气泡 -->
+                        <div id="tree-speech-bubble" class="opacity-0 transition-all duration-300 transform -translate-y-1 absolute top-2 bg-white/95 backdrop-blur-xs px-3 py-1.5 rounded-2xl shadow-md border border-emerald-100 text-xs font-medium text-emerald-800 z-20 pointer-events-none text-center max-w-[240px]">
+                            谢谢你的抚摸，空气变清新啦！
+                        </div>
+
+                        <!-- SVG 树苗渲染区 -->
+                        <div id="main-tree-svg-wrapper" class="w-full h-full flex items-center justify-center"></div>
+
+                        <!-- 100% 满级解锁第二株悬浮横幅 -->
+                        <div id="tree-mature-banner" class="hidden absolute bottom-1 inset-x-2 z-20">
+                            <button onclick="event.stopPropagation(); openUnlockNextTreeModal();" class="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-600 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 flex items-center justify-between animate-bounce">
+                                <span>🎉 已达 100% 满级！入驻森林并解锁新树苗</span>
+                                <span class="bg-white/25 px-2 py-0.5 rounded-lg">去种植 →</span>
+                            </button>
+                        </div>
+
+                        <!-- 特效层 -->
+                        <div id="fx-layer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+                    </div>
+
+                    <!-- 底部进度条与自然生长说明（无任何快进按钮） -->
+                    <div class="relative z-10 bg-white/80 backdrop-blur-xs rounded-2xl p-2.5 border border-white/90">
+                        <div class="flex justify-between items-center text-[11px] mb-1">
+                            <span class="font-semibold text-slate-700 flex items-center gap-1">
+                                <span>🫁 距离本株满级 (365天)：</span>
+                                <span id="tree-days-progress-text" class="text-emerald-600 font-bold tabular-nums">0.0 / 365 天</span>
+                            </span>
+                            <span id="tree-water-bonus-text" class="text-[10px] text-sky-600 font-medium tabular-nums">甘露加速 +0.0天</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-slate-200/80 rounded-full overflow-hidden p-0.5">
+                            <div id="stage-progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-500 rounded-full transition-all duration-500" style="width: 12%"></div>
+                        </div>
+                        <div class="mt-1.5 flex items-center justify-between text-[10px] text-slate-400">
+                            <span>🌿 真实呼吸计时 · 每日限浇3次 · 间隔2小时</span>
+                            <span id="total-water-lifetime" class="text-slate-500 font-medium tabular-nums">本株浇水 0 次</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 核心互动操作区（打卡 + 每日限3次/2小时冷却浇水） -->
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button id="btn-checkin" onclick="dailyCheckIn()" class="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 flex flex-col justify-between text-left transition active:scale-[0.97]">
+                        <div class="flex items-center justify-between w-full mb-1">
+                            <span class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-base">☀️</span>
+                            <span id="streak-badge" class="text-[10px] font-bold bg-black/15 px-2 py-0.5 rounded-full">已连签 0 天</span>
+                        </div>
+                        <div>
+                            <div id="checkin-title" class="font-bold text-sm">今日戒烟打卡</div>
+                            <div id="checkin-sub" class="text-[11px] text-emerald-100 mt-0.5">加速树苗生长 (+1.5天效)</div>
+                        </div>
+                    </button>
+
+                    <button id="btn-water" onclick="waterTree()" class="p-3.5 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/20 flex flex-col justify-between text-left transition active:scale-[0.97]">
+                        <div class="flex items-center justify-between w-full mb-1">
+                            <span id="water-icon" class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-base">💧</span>
+                            <span id="water-quota-badge" class="text-[10px] font-bold bg-black/15 px-2 py-0.5 rounded-full tabular-nums">今日甘露 0/3</span>
+                        </div>
+                        <div>
+                            <div id="water-title" class="font-bold text-sm">给树苗浇水</div>
+                            <div id="water-sub" class="text-[11px] text-sky-100 mt-0.5 tabular-nums">甘露滋润 (+0.5天效)</div>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- ==================== 科学临床心肺恢复仪表盘 ==================== -->
+                <div class="bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
+                    <div class="flex items-center justify-between mb-2.5">
+                        <div>
+                            <h2 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                <span class="w-1.5 h-3.5 rounded-full bg-emerald-500"></span>
+                                <span>科学临床心肺恢复仪表盘</span>
+                            </h2>
+                            <p class="text-[10px] text-slate-400 mt-0.5">基于 WHO / 美国癌症协会 / 英国 NHS 戒烟医学模型</p>
+                        </div>
+                        <button onclick="switchTab('milestones')" class="text-[11px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-xl transition">
+                            医学时间轴 →
+                        </button>
+                    </div>
+
+                    <!-- 当前医学状态提示条 -->
+                    <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-2.5 mb-3 flex items-start gap-2.5">
+                        <span class="text-base mt-0.5">🩺</span>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[11px] font-bold text-emerald-900" id="clinical-stage-title">正在启动身体自我修复机制…</div>
+                            <p class="text-[11px] text-emerald-700/90 mt-0.5 leading-snug" id="clinical-stage-desc">停止吸烟后，心率与血压率先开始回落，树苗根系重新恢复吸水。</p>
+                        </div>
+                    </div>
+
+                    <!-- 四项核心临床生理恢复指标 -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
+                            <div class="flex justify-between items-center text-[11px] mb-1">
+                                <span class="text-slate-600 font-medium">🩸 一氧化碳清除</span>
+                                <span id="med-co-val" class="font-extrabold text-sky-600 tabular-nums">0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div id="med-co-bar" class="h-full bg-sky-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="text-[9px] text-slate-400 mt-1">12小时血氧恢复正常</div>
+                        </div>
+
+                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
+                            <div class="flex justify-between items-center text-[11px] mb-1">
+                                <span class="text-slate-600 font-medium">🫁 肺部纤毛再生度</span>
+                                <span id="med-cilia-val" class="font-extrabold text-emerald-600 tabular-nums">0.0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div id="med-cilia-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="text-[9px] text-slate-400 mt-1">1~9个月清除焦油粘液</div>
+                        </div>
+
+                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
+                            <div class="flex justify-between items-center text-[11px] mb-1">
+                                <span class="text-slate-600 font-medium">🌬️ 肺功能提升幅度</span>
+                                <span id="med-lung-val" class="font-extrabold text-teal-600 tabular-nums">+0.0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div id="med-lung-bar" class="h-full bg-teal-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="text-[9px] text-slate-400 mt-1">3个月肺功能最高提升30%</div>
+                        </div>
+
+                        <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-100">
+                            <div class="flex justify-between items-center text-[11px] mb-1">
+                                <span class="text-slate-600 font-medium">❤️ 冠心病风险降幅</span>
+                                <span id="med-heart-val" class="font-extrabold text-rose-500 tabular-nums">-0.0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div id="med-heart-bar" class="h-full bg-rose-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="text-[9px] text-slate-400 mt-1">满1年额外风险降低50%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 实时戒烟数据看板 & 烟瘾急救 -->
+                <div class="bg-white rounded-3xl p-4 shadow-xs border border-slate-100 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <span class="w-1.5 h-3.5 rounded-full bg-amber-500"></span>
+                            <span>累计戒烟成果</span>
+                        </h2>
+                        <button onclick="openCravingModal()" class="px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold flex items-center gap-1 transition">
+                            <span>🌬️ 烟瘾急救呼吸</span>
+                        </button>
+                    </div>
+
+                    <!-- 跳动计时器 -->
+                    <div class="bg-slate-50 rounded-2xl p-2.5 border border-slate-100 flex items-center justify-around text-center">
+                        <div>
+                            <div id="timer-days" class="text-lg font-extrabold text-slate-800 tabular-nums">0</div>
+                            <div class="text-[10px] text-slate-400">天</div>
+                        </div>
+                        <div class="text-slate-300 font-bold">:</div>
+                        <div>
+                            <div id="timer-hours" class="text-lg font-extrabold text-slate-800 tabular-nums">00</div>
+                            <div class="text-[10px] text-slate-400">时</div>
+                        </div>
+                        <div class="text-slate-300 font-bold">:</div>
+                        <div>
+                            <div id="timer-mins" class="text-lg font-extrabold text-slate-800 tabular-nums">00</div>
+                            <div class="text-[10px] text-slate-400">分</div>
+                        </div>
+                        <div class="text-slate-300 font-bold">:</div>
+                        <div>
+                            <div id="timer-secs" class="text-lg font-extrabold text-emerald-600 tabular-nums">00</div>
+                            <div class="text-[10px] text-slate-400">秒</div>
+                        </div>
+                    </div>
+
+                    <!-- 三项量化收益 -->
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-emerald-50/60 rounded-2xl p-2 border border-emerald-100/80">
+                            <div class="text-[10px] text-slate-500">少抽香烟</div>
+                            <div class="text-sm font-extrabold text-emerald-700 tabular-nums"><span id="stat-cigs">0</span> <span class="text-[10px] font-normal">支</span></div>
+                        </div>
+                        <div class="bg-amber-50/60 rounded-2xl p-2 border border-amber-100/80">
+                            <div class="text-[10px] text-slate-500">节省资金</div>
+                            <div class="text-sm font-extrabold text-amber-700 tabular-nums">¥<span id="stat-money">0.0</span></div>
+                        </div>
+                        <div class="bg-sky-50/60 rounded-2xl p-2 border border-sky-100/80">
+                            <div class="text-[10px] text-slate-500">重获寿命</div>
+                            <div class="text-sm font-extrabold text-sky-700 tabular-nums"><span id="stat-life">0分</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== TAB 2: 蚂蚁森林式「我的生命森林」全景图 ==================== -->
+            <div id="tab-forest" class="px-4 pt-1 space-y-3.5 hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-800 flex items-center gap-1.5">
+                            <span>🌳 我的生命森林</span>
+                            <span id="forest-level-badge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">初生林地</span>
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">每坚持戒烟 1 年（100%肺部焕新），永久种下一棵参天大树</p>
+                    </div>
+                </div>
+
+                <!-- 全景交互画卷 -->
+                <div class="relative rounded-3xl overflow-hidden border border-emerald-200/80 shadow-md bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-100">
+                    <div class="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
+                        <div class="bg-white/85 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-xs border border-white flex items-center gap-3">
+                            <div>
+                                <div class="text-[9px] text-slate-400">已成林大树</div>
+                                <div class="text-xs font-extrabold text-emerald-700"><span id="forest-mature-count">0</span> 棵</div>
+                            </div>
+                            <div class="w-[1px] h-5 bg-slate-200"></div>
+                            <div>
+                                <div class="text-[9px] text-slate-400">培育中幼苗</div>
+                                <div class="text-xs font-extrabold text-amber-600">1 株</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/85 backdrop-blur-md px-2.5 py-1.5 rounded-2xl shadow-xs border border-white text-right">
+                            <div class="text-[9px] text-slate-400">生态解锁</div>
+                            <div id="forest-eco-text" class="text-[11px] font-bold text-teal-700">草地 · 蝴蝶</div>
+                        </div>
+                    </div>
+
+                    <div id="forest-panorama-container" class="w-full h-80 relative"></div>
+
+                    <div class="bg-white/90 backdrop-blur-xs px-3.5 py-2 border-t border-emerald-100 flex items-center justify-between text-[11px]">
+                        <span class="text-slate-600">👆 点击森林中的任意树木查看专属成长铭牌</span>
+                        <button id="forest-unlock-shortcut" onclick="openUnlockNextTreeModal()" class="hidden px-2.5 py-1 rounded-xl bg-emerald-500 text-white font-bold shadow-xs animate-pulse">
+                            + 种下新树苗
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 森林生态进阶指南 -->
+                <div class="bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
+                    <h3 class="text-xs font-bold text-slate-800 mb-2.5 flex items-center gap-1.5">
+                        <span>✨ 森林生态演化图鉴</span>
+                    </h3>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div id="eco-card-1" class="p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200">
+                            <div class="text-lg mb-1">🦋</div>
+                            <div class="text-[11px] font-bold text-slate-800">1 棵树 · 希望草甸</div>
+                            <div class="text-[9px] text-emerald-700 mt-0.5">彩蝶飞舞与阳光草地</div>
+                        </div>
+                        <div id="eco-card-2" class="p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-60">
+                            <div class="text-lg mb-1">🦌</div>
+                            <div class="text-[11px] font-bold text-slate-800">2 棵树 · 灵鹿溪谷</div>
+                            <div class="text-[9px] text-slate-500 mt-0.5">清澈溪流与林间小鹿</div>
+                        </div>
+                        <div id="eco-card-3" class="p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-60">
+                            <div class="text-lg mb-1">🏡</div>
+                            <div class="text-[11px] font-bold text-slate-800">3 棵+ · 彩虹秘境</div>
+                            <div class="text-[9px] text-slate-500 mt-0.5">森林木屋与双道彩虹</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 树木档案列表 -->
+                <div>
+                    <h3 class="text-xs font-bold text-slate-700 mb-2 px-1">📜 树木守护档案</h3>
+                    <div id="forest-tree-cards-list" class="space-y-2.5"></div>
+                </div>
+            </div>
+
+            <!-- ==================== TAB 3: WHO / NHS 医学恢复时间轴 ==================== -->
+            <div id="tab-milestones" class="px-4 pt-1 space-y-3.5 hidden">
+                <div>
+                    <h2 class="text-lg font-extrabold text-slate-800">科学戒烟临床时间轴</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">参考 WHO、美国癌症协会及英国 NHS 戒烟临床指南</p>
+                </div>
+                <div id="health-timeline-list" class="space-y-3 relative before:content-[''] before:absolute before:left-[15px] before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200"></div>
+            </div>
+
+        </div>
+
+        <!-- 底部 3-Tab 导航栏 -->
+        <div class="bg-white/95 backdrop-blur-md border-t border-slate-100 px-4 flex items-center justify-around shrink-0 z-20" style="padding-bottom: max(8px, env(safe-area-inset-bottom)); min-height: 64px;">
+            <button onclick="switchTab('home')" id="nav-btn-home" class="flex flex-col items-center justify-center gap-1 text-emerald-600 transition flex-1 py-1">
+                <div class="w-8 h-7 rounded-xl bg-emerald-50 flex items-center justify-center">
+                    <span class="text-sm">🌱</span>
+                </div>
+                <span class="text-[11px] font-bold">培育树苗</span>
+            </button>
+
+            <button onclick="switchTab('forest')" id="nav-btn-forest" class="flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-600 transition flex-1 relative py-1">
+                <div class="w-8 h-7 rounded-xl flex items-center justify-center">
+                    <span class="text-sm">🌳</span>
+                </div>
+                <span class="text-[11px] font-medium">生命森林</span>
+                <span id="nav-forest-dot" class="hidden absolute top-0.5 right-6 w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+            </button>
+
+            <button onclick="switchTab('milestones')" id="nav-btn-milestones" class="flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-600 transition flex-1 py-1">
+                <div class="w-8 h-7 rounded-xl flex items-center justify-center">
+                    <span class="text-sm">🩺</span>
+                </div>
+                <span class="text-[11px] font-medium">医学恢复</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== 弹窗 1：存到手机浏览器书签 / 主屏幕指引 ==================== -->
+    <div id="modal-bookmark-tip" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
+        <div class="bg-white rounded-3xl w-full p-5 shadow-2xl border border-emerald-100">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-base font-extrabold text-slate-800">📲 存到手机浏览器或主屏幕</h3>
+                <button onclick="closeBookmarkTipModal()" class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">✕</button>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed mb-3">
+                你的戒烟计时、每日打卡、浇水冷却（每2小时一次，每日3次）和森林进度会自动保存在当前手机浏览器的本地存储中。
+            </p>
+            <div class="bg-emerald-50/80 border border-emerald-100 rounded-2xl p-3 space-y-2 text-xs text-slate-700">
+                <div><strong class="text-emerald-800">1. iPhone Safari：</strong>打开网址后点底部「分享」图标 → 选择「加入书签」或「添加到主屏幕」。</div>
+                <div><strong class="text-emerald-800">2. 安卓 Chrome / 夸克：</strong>点右上角菜单「⋮」→ 选择「添加至书签」或「安装应用 / 添加到主屏幕」。</div>
+            </div>
+            <button onclick="closeBookmarkTipModal()" class="mt-4 w-full py-2.5 rounded-2xl bg-slate-800 text-white text-xs font-bold">知道了</button>
+        </div>
+    </div>
+
+    <!-- ==================== 弹窗 2：100% 满级解锁第二株新树苗选择 Modal ==================== -->
+    <div id="modal-unlock-tree" class="absolute inset-0 bg-slate-900/65 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl w-full p-5 shadow-2xl border border-emerald-100 max-h-[88vh] flex flex-col">
+            <div class="text-center mb-3">
+                <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-extrabold mb-1.5">
+                    <span>🏆 365天 · 100% 肺部焕新达成</span>
+                </div>
+                <h3 class="text-lg font-extrabold text-slate-800">生命树已参天，开启下一株！</h3>
+                <p class="text-xs text-slate-500 mt-1">上一株大树已永久入驻你的「生命森林」，请选择下一年度要培育的珍稀树种：</p>
+            </div>
+            <div id="species-selector-list" class="space-y-2 overflow-y-auto no-scrollbar py-1 flex-1"></div>
+            <div class="mt-4 flex gap-2.5">
+                <button onclick="closeUnlockNextTreeModal()" class="px-4 py-3 rounded-2xl bg-slate-100 text-slate-600 text-xs font-bold">稍后再说</button>
+                <button onclick="confirmPlantNextTree()" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-bold shadow-lg shadow-emerald-500/25 active:scale-95 transition">
+                    🌱 认领并开启新树苗
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 弹窗 3：森林单棵树木详情铭牌 Modal ==================== -->
+    <div id="modal-tree-plaque" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
+        <div class="bg-gradient-to-b from-emerald-50 via-white to-white rounded-3xl w-full p-5 text-center shadow-2xl border border-emerald-200 relative">
+            <button onclick="closeTreePlaqueModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm font-bold">✕</button>
+            <div id="plaque-badge" class="inline-block px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold mb-2">第 1 株 · 已成林</div>
+            <h3 id="plaque-title" class="text-lg font-extrabold text-slate-800">希望白桦</h3>
+            <p id="plaque-subtitle" class="text-[11px] text-slate-400 mt-0.5">认领于 2026-11-23</p>
+            <div id="plaque-svg-box" class="h-36 flex items-center justify-center my-2"></div>
+            <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 grid grid-cols-3 gap-2 text-center my-3">
+                <div>
+                    <div class="text-[10px] text-slate-400">守护天数</div>
+                    <div id="plaque-days" class="text-sm font-extrabold text-slate-800">365 天</div>
+                </div>
+                <div>
+                    <div class="text-[10px] text-slate-400">少吸香烟</div>
+                    <div id="plaque-cigs" class="text-sm font-extrabold text-emerald-600">5,475 支</div>
+                </div>
+                <div>
+                    <div class="text-[10px] text-slate-400">节省资金</div>
+                    <div id="plaque-money" class="text-sm font-extrabold text-amber-600">¥6,843</div>
+                </div>
+            </div>
+            <p id="plaque-desc" class="text-xs text-slate-600 italic leading-relaxed mb-4">
+                “它见证了你戒烟第一年的每一次克制与新生，永远挺立在你的生命森林中。”
+            </p>
+            <button onclick="closeTreePlaqueModal()" class="w-full py-2.5 rounded-2xl bg-slate-800 text-white text-xs font-bold">关闭铭牌</button>
+        </div>
+    </div>
+
+    <!-- ==================== 弹窗 4：烟瘾深呼吸急救 Modal ==================== -->
+    <div id="modal-craving" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
+        <div class="bg-white rounded-3xl w-full p-6 text-center shadow-2xl relative overflow-hidden">
+            <button onclick="closeCravingModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm font-bold">✕</button>
+            <div class="inline-block px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold mb-2">烟瘾渴求通常只持续 60 秒</div>
+            <h3 class="text-lg font-bold text-slate-800">跟随光圈深呼吸</h3>
+            <p id="breath-guide-text" class="text-xs text-slate-500 mt-1">用鼻腔缓缓吸气，感受纯净氧气进入肺泡…</p>
+            <div class="my-7 relative h-36 flex items-center justify-center">
+                <div class="w-32 h-32 rounded-full bg-emerald-400/25 breath-circle absolute"></div>
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex flex-col items-center justify-center text-white shadow-lg relative z-10">
+                    <span id="breath-countdown" class="text-2xl font-extrabold tabular-nums">60</span>
+                    <span id="breath-phase" class="text-[11px] font-medium mt-0.5">吸气...</span>
+                </div>
+            </div>
+            <button onclick="completeCravingEarly()" class="w-full py-3 rounded-2xl bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">
+                我已克制住！获赠额外清泉并跳过冷却
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== 弹窗 5：每日打卡成功鼓励卡片 ==================== -->
+    <div id="modal-checkin" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
+        <div class="bg-gradient-to-b from-emerald-50 to-white rounded-3xl w-full p-6 text-center shadow-2xl border border-emerald-100">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-500 text-white text-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-emerald-500/30">
+                🌿
+            </div>
+            <div class="text-xs font-bold text-emerald-600 uppercase tracking-wider">DAILY CHECK-IN</div>
+            <h3 class="text-xl font-extrabold text-slate-800 mt-1">今日无烟打卡成功！</h3>
+            <p id="checkin-quote" class="text-xs text-slate-600 mt-2.5 leading-relaxed bg-white p-3 rounded-2xl border border-emerald-100/80 italic">
+                “你拒绝的不是一支烟，而是对身体的慢性消耗。”
+            </p>
+            <div class="mt-4 flex justify-center gap-3 text-xs">
+                <div class="bg-amber-50 px-3 py-1.5 rounded-xl text-amber-700 font-bold">☀️ 成长加速 +1.5天</div>
+                <div class="bg-emerald-50 px-3 py-1.5 rounded-xl text-emerald-700 font-bold">🔥 连签 <span id="modal-streak-num">1</span> 天</div>
+            </div>
+            <button onclick="closeCheckinModal()" class="mt-5 w-full py-3 rounded-2xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-700 transition">
+                继续守护小树苗
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== 弹窗 6：重置确认弹窗 ==================== -->
+    <div id="modal-reset" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-5 hidden">
+        <div class="bg-white rounded-3xl w-full p-5 text-center shadow-2xl">
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 text-xl flex items-center justify-center mx-auto mb-2">
+                🔄
+            </div>
+            <h3 class="text-base font-bold text-slate-800">重新设置烟龄与烟量？</h3>
+            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                返回初始评估页可以重新输入不同的烟龄与每日吸烟量，清空当前森林存档并重新开始体验。
+            </p>
+            <div class="mt-5 grid grid-cols-2 gap-2.5">
+                <button onclick="closeResetModal()" class="py-2.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold">取消</button>
+                <button onclick="confirmResetApp()" class="py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold shadow-md shadow-rose-500/20">重新评估</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局轻量 Toast 提示 -->
+    <div id="toast-box" class="pointer-events-none absolute top-14 left-1/2 -translate-x-1/2 bg-slate-800/95 text-white text-xs font-medium px-4 py-2 rounded-full shadow-lg opacity-0 transition-opacity duration-300 z-50 whitespace-nowrap">
+        提示信息
+    </div>
+
 </div>
 
 <script>
-const STORAGE_KEY = "breath_forest_state_v1";
-const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
-const DAILY_WATER_LIMIT = 3;
-const FULL_RECOVERY_DAYS = 365;
+    // ==================== 全局状态与科学模型配置 ====================
+    const STORAGE_KEY = 'senhuxi_mobile_web_v1';
+    const DAYS_PER_TREE = 365; // 每株树苗满级周期：365天（1年）
+    const DAILY_WATER_MAX = 3; // 每日基础浇水上限：3次
+    const WATER_COOLDOWN_MS = 2 * 60 * 60 * 1000; // 每次浇水冷却时间：2小时
 
-const SPECIES_LIST = [
-  { id: "camphor", name: "希望香樟", emoji: "🌿", leaf: "#388e5c", canopy: "#52ad76" },
-  { id: "birch", name: "雪域白桦", emoji: "🌳", leaf: "#469b67", canopy: "#72c28e" },
-  { id: "sakura", name: "治愈樱花树", emoji: "🌸", leaf: "#e07a9f", canopy: "#f3a6c2" },
-  { id: "ginkgo", name: "黄金银杏", emoji: "🍂", leaf: "#d99b26", canopy: "#f2be49" }
-];
+    const TREE_SPECIES = [
+        {
+            id: 'birch',
+            name: '希望白桦',
+            tag: '第1年基础树种',
+            crownColors: ['#16a34a', '#22c55e', '#4ade80'],
+            trunkColor: '#6d4c33',
+            flowerColor: '#ffffff',
+            fruitColor: '#f43f5e',
+            desc: '洁白坚韧的树干象征重新洁净的呼吸道，陪伴你走过戒烟最关键的第一年。'
+        },
+        {
+            id: 'sakura',
+            name: '治愈樱花树',
+            tag: '第2年解锁珍稀',
+            crownColors: ['#f472b6', '#f9a8d4', '#fbcfe8'],
+            trunkColor: '#5c3d28',
+            flowerColor: '#fff1f2',
+            fruitColor: '#fb7185',
+            desc: '满树烂漫樱花，象征你的嗅觉与味觉全面苏醒，呼吸间尽是春天的芬芳。'
+        },
+        {
+            id: 'fir',
+            name: '雪域冷杉',
+            tag: '高海拔常青木',
+            crownColors: ['#0f766e', '#0d9488', '#2dd4bf'],
+            trunkColor: '#4a3525',
+            flowerColor: '#fef08a',
+            fruitColor: '#f59e0b',
+            desc: '四季常青的苍翠冷杉，代表你强大的自律意志与充沛强劲的心肺耐力。'
+        },
+        {
+            id: 'ginkgo',
+            name: '黄金银杏',
+            tag: '长寿生命之树',
+            crownColors: ['#d97706', '#f59e0b', '#fbbf24'],
+            trunkColor: '#5c4033',
+            flowerColor: '#fef9c3',
+            fruitColor: '#ea580c',
+            desc: '灿若暖阳的金色树冠，见证你远离烟草危害、重获长寿与健康的辉煌里程碑。'
+        }
+    ];
 
-const MILESTONES = [
-  { days: 0.014, label: "20 分钟", title: "心率与血压开始回落", desc: "尼古丁刺激减弱，循环系统迈出第一步" },
-  { days: 0.5, label: "12 小时", title: "血液一氧化碳水平下降", desc: "血液携氧能力改善，头脑更清爽" },
-  { days: 2, label: "48 小时", title: "尼古丁代谢产物明显排出", desc: "味觉与嗅觉神经末梢开始恢复敏感" },
-  { days: 14, label: "2 周", title: "肺活量与循环明显改善", desc: "走路气喘减轻，肺功能开始稳步提升" },
-  { days: 90, label: "3 个月", title: "肺功能显著回升", desc: "呼吸更顺畅，咳嗽与胸闷感大幅减少" },
-  { days: 270, label: "9 个月", title: "气道纤毛逐步修复", desc: "肺部清洁能力增强，感染风险下降" },
-  { days: 365, label: "1 年（365天）", title: "达成年度 100% 满级树苗", desc: "心血管长期风险显著降低，可解锁下一株新树！" }
-];
+    const VISUAL_STAGES = [
+        {
+            id: 1,
+            name: '濒危枯苗',
+            minPct: 0,
+            bgGradient: 'from-stone-200 via-amber-50/70 to-stone-100',
+            badgeClass: 'bg-rose-100 text-rose-800',
+            mood: '“好干渴…土壤都裂开了，快用清新空气救救我…”'
+        },
+        {
+            id: 2,
+            name: '复苏嫩芽',
+            minPct: 15,
+            bgGradient: 'from-amber-50 via-lime-50/70 to-emerald-50/60',
+            badgeClass: 'bg-amber-100 text-amber-800',
+            mood: '“尼古丁正在排出！我的枝头冒出了一点新绿~”'
+        },
+        {
+            id: 3,
+            name: '茁壮小树',
+            minPct: 35,
+            bgGradient: 'from-sky-50 via-emerald-50/80 to-teal-50/70',
+            badgeClass: 'bg-emerald-100 text-emerald-800',
+            mood: '“肺活量在提升！我的树干越来越挺拔有力了！”'
+        },
+        {
+            id: 4,
+            name: '繁茂花树',
+            minPct: 65,
+            bgGradient: 'from-sky-100/80 via-emerald-50 to-amber-50/60',
+            badgeClass: 'bg-teal-100 text-teal-800',
+            mood: '“肺部纤毛重新长出来啦，树冠开出了美丽的花！”'
+        },
+        {
+            id: 5,
+            name: '参天生命树',
+            minPct: 95,
+            bgGradient: 'from-amber-100/75 via-emerald-100/75 to-sky-100/85',
+            badgeClass: 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white',
+            mood: '“心肺功能趋近全面焕新！即将长成参天大树入驻森林！”'
+        }
+    ];
 
-function todayStr() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+    const CLINICAL_TIMELINE = [
+        {
+            mins: 20,
+            label: '20 分钟',
+            title: '心率与血压开始回落',
+            treeLink: '树苗根系重新吸水',
+            desc: '停止吸烟仅20分钟，因尼古丁引起的末梢血管收缩开始缓解，过快的心率与升高的血压逐渐恢复正常。'
+        },
+        {
+            mins: 720,
+            label: '12 小时',
+            title: '血液一氧化碳浓度恢复正常',
+            treeLink: '枯黄叶片停止凋落',
+            desc: '12小时后，血液中有毒的一氧化碳水平降至正常值，血红蛋白携氧能力恢复，大脑与心肌获得充足氧气。'
+        },
+        {
+            mins: 2880,
+            label: '48 小时',
+            title: '尼古丁基本排出，嗅觉与味觉苏醒',
+            treeLink: '枝头抽出第一抹嫩芽',
+            desc: '48小时后，体内残余尼古丁几乎完全代谢排出，受损的嗅觉和味觉神经末梢开始再生，食物变得更香甜。'
+        },
+        {
+            mins: 20160,
+            label: '2 周 ~ 3 个月',
+            title: '肺功能最高提升 30%，循环显著改善',
+            treeLink: '树冠舒展、枝叶繁茂',
+            desc: '血液循环大幅改善，步行与运动更加轻松；肺活量与肺功能最高可提升 30%，呼吸不再沉重。'
+        },
+        {
+            mins: 129600,
+            label: '1 ~ 9 个月',
+            title: '肺部纤毛再生，咳嗽与气短大幅减少',
+            treeLink: '树冠盛开花朵引来彩蝶',
+            desc: '肺部支气管内微小的纤毛结构重新生长，恢复清扫焦油黏液与抵御感染的能力，晨起咳嗽和气短明显消失。'
+        },
+        {
+            mins: 525600,
+            label: '1 年 (365天)',
+            title: '冠心病风险降至吸烟者一半 · 100%阶段满级',
+            treeLink: '长成参天生命树并结出金果',
+            desc: '坚持戒烟满1年！冠心病额外风险比吸烟者降低 50%，呼吸系统微环境全面焕新，解锁下一株生命树苗！'
+        }
+    ];
 
-function defaultState() {
-  return {
-    onboarded: false,
-    yearsSmoked: 5,
-    cigsPerDay: 15,
-    quitStartAt: null,
-    lastCheckinDate: null,
-    streakDays: 0,
-    waterCountToday: 0,
-    waterDate: todayStr(),
-    lastWaterAt: 0,
-    bonusWater: 0,
-    currentSpeciesId: "camphor",
-    currentTreeStartAt: null,
-    forestTrees: [],
-    activeTab: "tree",
-    selectedForestTreeIdx: null
-  };
-}
+    const ENCOURAGE_QUOTES = [
+        "你拒绝的不是一支烟，而是对身体的慢性伤害。",
+        "每一次深呼吸，都是给生命树苗输送最纯净的氧气。",
+        "烟瘾渴求只是大脑短暂的习惯回响，熬过60秒你就赢了！",
+        "省下的每一分钱、多出的每一口清新空气，都在奖励未来的你。",
+        "坚持满365天，这棵大树将永远挺立在你的生命森林中！"
+    ];
 
-let state = loadState();
-let breathInterval = null;
-let breathRemaining = 60;
-let breathRunning = false;
+    let appState = null;
+    let timerInterval = null;
+    let breathInterval = null;
+    let breathSecondsLeft = 60;
+    let selectedNextSpeciesId = 'sakura';
+    let lastRenderedStageId = null;
+    let lastRenderedSpeciesId = null;
 
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultState();
-    return { ...defaultState(), ...JSON.parse(raw) };
-  } catch (e) {
-    return defaultState();
-  }
-}
+    // ==================== 初始化与本地存储 ====================
+    function initApp() {
+        updateClock();
+        setInterval(updateClock, 30000);
 
-function saveState() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch (e) {}
-}
-
-function syncDailyQuota() {
-  const today = todayStr();
-  if (state.waterDate !== today) {
-    state.waterDate = today;
-    state.waterCountToday = 0;
-    saveState();
-  }
-}
-
-function damageIndex() {
-  const packYears = (state.yearsSmoked * state.cigsPerDay) / 20;
-  return Math.min(100, Math.round(15 + packYears * 2.2));
-}
-
-function initialHealthStart() {
-  // 重度烟龄/烟量起始生命值更低（5%~35%），坚持 365 天后达到 100%
-  const dmg = damageIndex();
-  return Math.max(5, Math.min(35, Math.round(38 - dmg * 0.32)));
-}
-
-function elapsedDaysForTree() {
-  const base = state.currentTreeStartAt || state.quitStartAt || Date.now();
-  return Math.max(0, (Date.now() - base) / (1000 * 60 * 60 * 24));
-}
-
-function totalQuitDays() {
-  if (!state.quitStartAt) return 0;
-  return Math.max(0, (Date.now() - state.quitStartAt) / (1000 * 60 * 60 * 24));
-}
-
-function recoveryPercent() {
-  const days = elapsedDaysForTree();
-  const start = initialHealthStart();
-  const ratio = Math.min(1, days / FULL_RECOVERY_DAYS);
-  return Math.min(100, Math.round((start + (100 - start) * ratio) * 10) / 10);
-}
-
-function treeStageInfo(pct) {
-  if (pct < 20) return { stage: 1, name: "濒危枯苗", status: "奄奄一息 · 急需呵护", badgeClass: "badge-danger" };
-  if (pct < 45) return { stage: 2, name: "复苏嫩芽", status: "破土微绿 · 渐入佳境", badgeClass: "badge-amber" };
-  if (pct < 75) return { stage: 3, name: "茁壮小树", status: "枝叶舒展 · 呼吸顺畅", badgeClass: "badge-green" };
-  if (pct < 100) return { stage: 4, name: "繁茂花树", status: "绿意盎然 · 活力充沛", badgeClass: "badge-green" };
-  return { stage: 5, name: "参天生命树", status: "100% 满级 · 可迎新树", badgeClass: "badge-green" };
-}
-
-function renderTreeSVG(stage, speciesId, isPreview = false) {
-  const sp = SPECIES_LIST.find(s => s.id === speciesId) || SPECIES_LIST[0];
-  const trunkColor = stage === 1 ? "#7a6652" : "#6b4c35";
-  const leafColor = stage === 1 ? "#9c8b56" : sp.leaf;
-  const canopyColor = stage === 1 ? "#b09f68" : sp.canopy;
-
-  if (stage === 1 && !isPreview) {
-    return `
-      <svg viewBox="0 0 180 180" width="100%" height="100%">
-        <ellipse cx="90" cy="154" rx="54" ry="12" fill="#d9cbb8" />
-        <path d="M90 152 Q86 122 92 98 Q78 86 70 92" stroke="${trunkColor}" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <path d="M91 114 Q105 103 113 108" stroke="${trunkColor}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-        <ellipse cx="68" cy="91" rx="8" ry="4" fill="${leafColor}" opacity="0.75"/>
-        <ellipse cx="114" cy="108" rx="7" ry="3.5" fill="${leafColor}" opacity="0.65"/>
-        <ellipse cx="93" cy="95" rx="6" ry="3" fill="${leafColor}" opacity="0.5"/>
-      </svg>
-    `;
-  }
-  if (stage === 1 && isPreview) {
-    return `
-      <svg viewBox="0 0 120 120" width="76" height="76">
-        <ellipse cx="60" cy="103" rx="36" ry="8" fill="#e2d6c5" />
-        <path d="M60 101 Q57 80 61 64 Q51 56 45 60" stroke="${trunkColor}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-        <path d="M60 76 Q71 68 77 72" stroke="${trunkColor}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-        <ellipse cx="44" cy="60" rx="6" ry="3" fill="${leafColor}" opacity="0.7"/>
-      </svg>
-    `;
-  }
-  if (stage === 2) {
-    return `
-      <svg viewBox="0 0 180 180" width="100%" height="100%">
-        <ellipse cx="90" cy="154" rx="54" ry="12" fill="#cde3d3" />
-        <path d="M90 152 Q88 118 90 84" stroke="${trunkColor}" stroke-width="7" fill="none" stroke-linecap="round"/>
-        <path d="M90 112 Q72 98 64 102" stroke="${trunkColor}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-        <path d="M90 104 Q108 90 116 94" stroke="${trunkColor}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-        <circle cx="90" cy="80" r="14" fill="${leafColor}" />
-        <circle cx="64" cy="100" r="10" fill="${canopyColor}" />
-        <circle cx="116" cy="92" r="10" fill="${canopyColor}" />
-      </svg>
-    `;
-  }
-  if (stage === 3) {
-    return `
-      <svg viewBox="0 0 180 180" width="100%" height="100%">
-        <ellipse cx="90" cy="156" rx="58" ry="12" fill="#c3dfc9" />
-        <path d="M90 154 L90 82" stroke="${trunkColor}" stroke-width="9" stroke-linecap="round"/>
-        <path d="M90 116 L64 94" stroke="${trunkColor}" stroke-width="5.5" stroke-linecap="round"/>
-        <path d="M90 108 L116 86" stroke="${trunkColor}" stroke-width="5.5" stroke-linecap="round"/>
-        <circle cx="90" cy="74" r="26" fill="${leafColor}" />
-        <circle cx="64" cy="90" r="20" fill="${canopyColor}" />
-        <circle cx="116" cy="84" r="20" fill="${canopyColor}" />
-        <circle cx="90" cy="58" r="18" fill="${canopyColor}" />
-      </svg>
-    `;
-  }
-  return `
-    <svg viewBox="0 0 180 180" width="100%" height="100%">
-      <ellipse cx="90" cy="158" rx="64" ry="12" fill="#b8d9bf" />
-      <path d="M90 156 L90 78" stroke="${trunkColor}" stroke-width="11" stroke-linecap="round"/>
-      <path d="M90 118 L58 90" stroke="${trunkColor}" stroke-width="6.5" stroke-linecap="round"/>
-      <path d="M90 108 L122 82" stroke="${trunkColor}" stroke-width="6.5" stroke-linecap="round"/>
-      <circle cx="90" cy="68" r="32" fill="${leafColor}" />
-      <circle cx="58" cy="86" r="24" fill="${canopyColor}" />
-      <circle cx="122" cy="80" r="24" fill="${canopyColor}" />
-      <circle cx="90" cy="46" r="22" fill="${canopyColor}" />
-      ${stage === 5 ? `
-        <circle cx="72" cy="58" r="4" fill="#fff7b2" />
-        <circle cx="110" cy="66" r="4" fill="#fff7b2" />
-        <circle cx="92" cy="36" r="4" fill="#fff7b2" />
-      ` : ""}
-    </svg>
-  `;
-}
-
-function getWaterCooldownRemainingMs() {
-  if (!state.lastWaterAt) return 0;
-  return Math.max(0, TWO_HOURS_MS - (Date.now() - state.lastWaterAt));
-}
-
-function formatDuration(ms) {
-  const totalSec = Math.ceil(ms / 1000);
-  const h = Math.floor(totalSec / 3600);
-  const m = Math.floor((totalSec % 3600) / 60);
-  const s = totalSec % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
-function completeOnboarding() {
-  const now = Date.now();
-  state.onboarded = true;
-  state.quitStartAt = now;
-  state.currentTreeStartAt = now;
-  state.lastCheckinDate = todayStr();
-  state.streakDays = 1;
-  state.waterDate = todayStr();
-  state.waterCountToday = 0;
-  state.lastWaterAt = 0;
-  state.bonusWater = 0;
-  state.activeTab = "tree";
-  saveState();
-  render();
-}
-
-function resetOnboarding() {
-  state = defaultState();
-  saveState();
-  render();
-}
-
-function handleCheckin() {
-  const today = todayStr();
-  if (state.lastCheckinDate === today) return;
-  state.lastCheckinDate = today;
-  state.streakDays = (state.streakDays || 0) + 1;
-  saveState();
-  render("今日无烟打卡成功！阳光已照耀生命之树。");
-}
-
-function handleWater() {
-  syncDailyQuota();
-  const cd = getWaterCooldownRemainingMs();
-  if (cd > 0) return;
-
-  if (state.waterCountToday < DAILY_WATER_LIMIT) {
-    state.waterCountToday += 1;
-    state.lastWaterAt = Date.now();
-    saveState();
-    render(`浇水成功！今日已浇水 ${state.waterCountToday}/${DAILY_WATER_LIMIT} 次，2 小时后可再次浇水。`);
-    return;
-  }
-
-  if (state.bonusWater > 0) {
-    state.bonusWater -= 1;
-    state.lastWaterAt = Date.now();
-    saveState();
-    render("使用了 1 次呼吸急救赠予的额外清泉，小树喝得超开心！");
-  }
-}
-
-function unlockNewTree(speciesId) {
-  const days = Math.max(1, Math.round(elapsedDaysForTree()));
-  const cigsAvoided = Math.round(days * state.cigsPerDay);
-  state.forestTrees.push({
-    speciesId,
-    days,
-    cigsAvoided,
-    completedAt: todayStr()
-  });
-  const nextIdx = (SPECIES_LIST.findIndex(s => s.id === speciesId) + 1) % SPECIES_LIST.length;
-  state.currentSpeciesId = SPECIES_LIST[nextIdx].id;
-  state.currentTreeStartAt = Date.now();
-  saveState();
-  render("恭喜！满级大树已收入生命森林，新一株小树苗已开启！");
-}
-
-function openBreathModal() {
-  breathRunning = false;
-  breathRemaining = 60;
-  clearInterval(breathInterval);
-  document.getElementById("breathPhase").textContent = "准备";
-  document.getElementById("breathSec").textContent = "60s";
-  document.getElementById("breathCircle").classList.remove("expand");
-  document.getElementById("breathActionBtn").textContent = "开始呼吸";
-  document.getElementById("breathModal").classList.add("show");
-}
-
-function closeBreathModal() {
-  breathRunning = false;
-  clearInterval(breathInterval);
-  document.getElementById("breathModal").classList.remove("show");
-}
-
-function toggleBreathTimer() {
-  if (breathRunning) {
-    breathRunning = false;
-    clearInterval(breathInterval);
-    document.getElementById("breathActionBtn").textContent = "继续呼吸";
-    return;
-  }
-  breathRunning = true;
-  document.getElementById("breathActionBtn").textContent = "暂停";
-  updateBreathVisual();
-  breathInterval = setInterval(() => {
-    if (!breathRunning) return;
-    breathRemaining -= 1;
-    if (breathRemaining <= 0) {
-      clearInterval(breathInterval);
-      breathRunning = false;
-      closeBreathModal();
-      state.lastWaterAt = 0;
-      state.bonusWater += 1;
-      saveState();
-      render("完成 60 秒深呼吸急救！已清除浇水冷却并赠送 1 次额外清泉。");
-      return;
-    }
-    updateBreathVisual();
-  }, 1000);
-}
-
-function updateBreathVisual() {
-  const cycle = (60 - breathRemaining) % 10;
-  const circle = document.getElementById("breathCircle");
-  const phaseEl = document.getElementById("breathPhase");
-  const secEl = document.getElementById("breathSec");
-  secEl.textContent = `${breathRemaining}s`;
-  if (cycle < 4) {
-    phaseEl.textContent = "缓慢吸气";
-    circle.classList.add("expand");
-  } else if (cycle < 6) {
-    phaseEl.textContent = "轻轻屏息";
-    circle.classList.add("expand");
-  } else {
-    phaseEl.textContent = "柔和呼气";
-    circle.classList.remove("expand");
-  }
-}
-
-function render(toastMessage = "") {
-  syncDailyQuota();
-  const root = document.getElementById("app");
-
-  if (!state.onboarded) {
-    const startPct = initialHealthStart();
-    const previewStage = treeStageInfo(startPct);
-    root.innerHTML = `
-      <div class="card">
-        <div class="badge badge-green" style="margin-bottom:8px;">森呼吸 · 生命之树</div>
-        <h1>认领你的第一株生命树苗</h1>
-        <p class="sub">根据烟龄与每日吸烟量评估初始受损状态，戒烟越久，树苗越枝繁叶茂。</p>
-
-        <div class="field">
-          <div class="field-head">
-            <span>烟龄</span>
-            <span class="field-val" id="yearsLabel">${state.yearsSmoked} 年</span>
-          </div>
-          <input type="range" min="1" max="35" value="${state.yearsSmoked}" oninput="onOnboardingInput('years', this.value)" />
-        </div>
-
-        <div class="field">
-          <div class="field-head">
-            <span>每天吸烟数量</span>
-            <span class="field-val" id="cigsLabel">${state.cigsPerDay} 支/天</span>
-          </div>
-          <input type="range" min="1" max="60" value="${state.cigsPerDay}" oninput="onOnboardingInput('cigs', this.value)" />
-        </div>
-
-        <div class="preview-box" id="previewBox">
-          ${renderTreeSVG(previewStage.stage, state.currentSpeciesId, true)}
-          <div>
-            <span class="badge ${previewStage.badgeClass}">${previewStage.name}</span>
-            <div style="font-weight:700;font-size:14px;margin-top:4px;">初始健康指数约 ${startPct}%</div>
-            <div class="sub" style="font-size:12px;">${previewStage.status}</div>
-          </div>
-        </div>
-
-        <button class="btn-primary" onclick="completeOnboarding()">开始戒烟并种下树苗</button>
-      </div>
-      <div class="disclaimer">科普说明：恢复进度参考 WHO/NHS 公开戒烟时间轴，仅供自我激励，不替代医疗诊断。</div>
-    `;
-    return;
-  }
-
-  const days = totalQuitDays();
-  const cigsAvoided = Math.round(days * state.cigsPerDay);
-  const pct = recoveryPercent();
-  const stageInfo = treeStageInfo(pct);
-  const todayChecked = state.lastCheckinDate === todayStr();
-  const cdMs = getWaterCooldownRemainingMs();
-  const isCooling = cdMs > 0;
-  const canWater = !isCooling && (state.waterCountToday < DAILY_WATER_LIMIT || state.bonusWater > 0);
-  const species = SPECIES_LIST.find(s => s.id === state.currentSpeciesId) || SPECIES_LIST[0];
-
-  if (state.activeTab === "forest") {
-    const count = state.forestTrees.length;
-    const scenery =
-      count === 0 ? "阳光草甸 · 等待第一棵满级大树加入"
-      : count === 1 ? "绿意草甸与蝴蝶 · 第一棵生命树已扎根"
-      : count === 2 ? "清澈溪流与林间小鹿 · 生命森林初具规模"
-      : "森林木屋与双道彩虹 · 茂密生命森林已成型";
-
-    const selected = state.selectedForestTreeIdx !== null ? state.forestTrees[state.selectedForestTreeIdx] : null;
-    const selectedSp = selected ? (SPECIES_LIST.find(s => s.id === selected.speciesId) || SPECIES_LIST[0]) : null;
-
-    root.innerHTML = `
-      <div class="card">
-        <div class="top-bar">
-          <div>
-            <h1 style="font-size:18px;">我的生命森林</h1>
-            <p class="sub">${scenery}</p>
-          </div>
-          <span class="badge badge-green">已成林 ${count} 棵</span>
-        </div>
-
-        <div class="forest-scene">
-          <div style="font-size:12px;color:var(--green);font-weight:600;">
-            累计少吸 ${cigsAvoided} 支香烟 · 已坚持 ${days.toFixed(1)} 天
-          </div>
-          <div class="forest-trees">
-            ${
-              count === 0
-                ? `<div style="padding:36px 12px;color:var(--muted);font-size:13px;">当前树苗达到 100% 后可收入森林，开启下一株新树种。</div>`
-                : state.forestTrees.map((t, idx) => {
-                    const sp = SPECIES_LIST.find(x => x.id === t.speciesId) || SPECIES_LIST[0];
-                    return `
-                      <div class="forest-tree-card" onclick="selectForestTree(${idx})">
-                        <div style="font-size:28px;">${sp.emoji}</div>
-                        <div style="font-weight:700;margin-top:4px;">${sp.name}</div>
-                        <div style="color:var(--muted);font-size:11px;">守护 ${t.days} 天</div>
-                      </div>
-                    `;
-                  }).join("")
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try {
+                appState = JSON.parse(saved);
+                if (!appState.forestTrees) appState.forestTrees = [];
+                if (!appState.watering) {
+                    appState.watering = {
+                        dateStr: new Date().toDateString(),
+                        todayCount: 0,
+                        bonusQuota: 0,
+                        lastWaterTimestamp: 0
+                    };
+                }
+                if (!appState.currentTree) {
+                    appState.currentTree = {
+                        index: 1,
+                        speciesId: 'birch',
+                        startTime: appState.totalStartTime || Date.now(),
+                        waterBonusDays: 0,
+                        waterCount: 0
+                    };
+                }
+                ensureDailyWaterReset();
+                showMainView();
+                return;
+            } catch (e) {
+                console.error('解析本地存档失败', e);
             }
-          </div>
-        </div>
-
-        ${
-          selected
-            ? `<div class="preview-box" style="margin-top:12px;margin-bottom:0;">
-                <div style="font-size:32px;">${selectedSp.emoji}</div>
-                <div>
-                  <div style="font-weight:700;">${selectedSp.name}（达成于 ${selected.completedAt}）</div>
-                  <div class="sub">该周期守护 ${selected.days} 天 · 少吸约 ${selected.cigsAvoided} 支烟</div>
-                </div>
-              </div>`
-            : ""
         }
-      </div>
-      <div class="disclaimer">每棵树代表一段坚定的无烟旅程，点击森林中的树可查看成长铭牌。</div>
-    `;
-  } else {
-    root.innerHTML = `
-      <div class="top-bar">
-        <div>
-          <h1 style="font-size:18px;">${species.emoji} ${species.name}</h1>
-          <p class="sub">烟龄 ${state.yearsSmoked} 年 · 每日 ${state.cigsPerDay} 支</p>
-        </div>
-        <button class="btn-ghost" onclick="resetOnboarding()">重设档案</button>
-      </div>
+        showOnboardingView();
+    }
 
-      <div class="stats-grid">
-        <div class="stat">
-          <div class="stat-num">${days.toFixed(1)}</div>
-          <div class="stat-label">累计无烟(天)</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">${cigsAvoided}</div>
-          <div class="stat-label">累计少吸(支)</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">${state.streakDays}</div>
-          <div class="stat-label">连续打卡(天)</div>
-        </div>
-      </div>
+    function ensureDailyWaterReset() {
+        if (!appState || !appState.watering) return false;
+        const todayStr = new Date().toDateString();
+        if (appState.watering.dateStr !== todayStr) {
+            appState.watering.dateStr = todayStr;
+            appState.watering.todayCount = 0;
+            appState.watering.bonusQuota = 0;
+            saveState();
+            return true;
+        }
+        return false;
+    }
 
-      <div class="card">
-        <div class="stage">
-          <div class="stage-top">
-            <span class="badge ${stageInfo.badgeClass}">${stageInfo.name}</span>
-            <span style="font-size:12px;color:var(--muted);">${stageInfo.status}</span>
-          </div>
-          <div class="tree-svg-wrap" id="treeWrap" onclick="petTree()">
-            ${renderTreeSVG(stageInfo.stage, state.currentSpeciesId, false)}
-          </div>
-          <div class="droplet-toast" id="toastMsg">${toastMessage || "轻触树苗可互动，坚持无烟让它舒展新叶"}</div>
-        </div>
+    function saveState() {
+        if (appState) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        }
+    }
 
-        <div style="margin-top:14px;">
-          <div class="field-head" style="margin-bottom:4px;">
-            <span>本株生命恢复进度</span>
-            <span class="field-val">${pct}%</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" style="width:${pct}%;"></div>
-          </div>
-          <div class="sub" style="font-size:12px;">以 365 天为完整周期映射恢复曲线，当前阶段：${stageInfo.name}</div>
-        </div>
+    function updateClock() {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        const el = document.getElementById('clock-time');
+        if (el) el.textContent = `${hh}:${mm}`;
+    }
 
-        ${
-          pct >= 100
-            ? `<div class="preview-box" style="background:var(--green-soft);border-style:solid;margin-top:12px;">
-                <div>
-                  <div style="font-weight:700;color:var(--green);">本株已达 100% 满级！</div>
-                  <div class="sub">将当前大树存入森林，并解锁下一株新树苗：</div>
-                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
-                    ${SPECIES_LIST.map(s => `<button class="btn-primary" style="width:auto;padding:8px 12px;font-size:12px;" onclick="unlockNewTree('${s.id}')">${s.emoji} 种下${s.name}</button>`).join("")}
-                  </div>
-                </div>
-              </div>`
-            : ""
+    // ==================== 1. 初始评估页 ====================
+    function calculateInitialHealthStart(years, cigsPerDay) {
+        const damage = (years * 1.1) + (cigsPerDay * 0.95);
+        const startPct = Math.max(2, Math.min(25, Math.round(28 - damage * 0.32)));
+        return startPct;
+    }
+
+    function updateOnboardingPreview() {
+        const years = parseInt(document.getElementById('input-years').value) || 1;
+        const cigs = parseInt(document.getElementById('input-cigs').value) || 1;
+
+        document.getElementById('val-years').textContent = years;
+        document.getElementById('val-cigs').textContent = cigs;
+
+        const startPct = calculateInitialHealthStart(years, cigs);
+        document.getElementById('preview-health-start').textContent = `${startPct.toFixed(1)}%`;
+        document.getElementById('preview-health-bar').style.width = `${startPct}%`;
+
+        const badge = document.getElementById('preview-status-badge');
+        const desc = document.getElementById('preview-desc');
+        const previewContainer = document.getElementById('onboarding-tree-preview');
+
+        let previewStage = 1;
+        if (startPct <= 12) {
+            badge.textContent = '重度濒危 · 奄奄一息';
+            badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700';
+            desc.textContent = '“长年的浓烟让树苗叶片焦黄卷曲、土壤干裂，呼吸微弱，急需你立刻开启无烟拯救！”';
+            previewStage = 1;
+        } else if (startPct <= 22) {
+            badge.textContent = '中度萎靡 · 枯黄缺水';
+            badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800';
+            desc.textContent = '“烟雾遮挡了阳光，树苗叶片发黄低垂、无精打采，只要开始戒烟就能逐步复苏。”';
+            previewStage = 1;
+        } else {
+            badge.textContent = '轻度受损 · 亟待舒展';
+            badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-lime-100 text-lime-800';
+            desc.textContent = '“你的烟龄较短，树苗还保留着一丝微弱绿意，坚持365天即可让它长成参天大树！”';
+            previewStage = 2;
         }
 
-        <div class="actions-grid">
-          <button class="btn-soft action-btn" ${todayChecked ? "disabled" : ""} onclick="handleCheckin()">
-            <span>${todayChecked ? "✓ 今日已打卡" : "☀️ 每日无烟打卡"}</span>
-            <span class="sub-note">${todayChecked ? "明日零点更新" : "签收今日阳光"}</span>
-          </button>
+        previewContainer.innerHTML = generateTreeSVG(previewStage, 'birch');
+    }
 
-          <button class="btn-soft action-btn" id="waterBtn" ${canWater ? "" : "disabled"} onclick="handleWater()">
-            <span id="waterBtnTitle">${
-              isCooling
-                ? "⏳ 冷却吸收中"
-                : state.waterCountToday < DAILY_WATER_LIMIT
-                  ? "💧 给树苗浇水"
-                  : state.bonusWater > 0
-                    ? "✨ 使用额外清泉"
-                    : "🌿 今日已饱饮"
-            }</span>
-            <span class="quota-tag" id="waterQuotaTag">今日 ${state.waterCountToday}/${DAILY_WATER_LIMIT}${state.bonusWater > 0 ? ` (+${state.bonusWater}赠)` : ""}</span>
-            <span class="sub-note" id="waterSubNote">${
-              isCooling
-                ? `还剩 ${formatDuration(cdMs)}`
-                : state.waterCountToday < DAILY_WATER_LIMIT
-                  ? "每 2 小时可浇 1 次"
-                  : state.bonusWater > 0
-                    ? "呼吸急救奖励可用"
-                    : "每日限 3 次，防伤根"
-            }</span>
-          </button>
-        </div>
+    function showOnboardingView() {
+        if (timerInterval) clearInterval(timerInterval);
+        document.getElementById('view-main').classList.add('hidden');
+        document.getElementById('view-onboarding').classList.remove('hidden');
+        document.getElementById('btn-reset-top').classList.add('hidden');
+        updateOnboardingPreview();
+    }
 
-        <button class="btn-amber" style="width:100%;margin-top:10px;" onclick="openBreathModal()">
-          🫁 烟瘾来袭？做 60 秒深呼吸急救（可获额外清泉）
-        </button>
-      </div>
+    function claimTreeAndStart() {
+        const years = parseInt(document.getElementById('input-years').value) || 5;
+        const cigs = parseInt(document.getElementById('input-cigs').value) || 15;
+        const price = parseFloat(document.getElementById('input-price').value) || 25;
+        const startPct = calculateInitialHealthStart(years, cigs);
 
-      <div class="card">
-        <h2>科学戒烟恢复时间轴</h2>
-        ${MILESTONES.map(m => {
-          const reached = days >= m.days;
-          return `
-            <div class="milestone-item ${reached ? "done" : ""}">
-              <div>
-                <div class="milestone-title">${reached ? "✓ " : ""}${m.title}</div>
-                <div class="milestone-desc">${m.desc}</div>
-              </div>
-              <span class="badge ${reached ? "badge-green" : "badge-amber"}">${m.label}</span>
-            </div>
-          `;
-        }).join("")}
-      </div>
+        const now = Date.now();
+        appState = {
+            smokeYears: years,
+            cigsPerDay: cigs,
+            packPrice: price,
+            initialHealthPct: startPct,
+            totalStartTime: now,
+            streakDays: 0,
+            lastCheckInDate: null,
+            watering: {
+                dateStr: new Date().toDateString(),
+                todayCount: 0,
+                bonusQuota: 0,
+                lastWaterTimestamp: 0
+            },
+            forestTrees: [],
+            currentTree: {
+                index: 1,
+                speciesId: 'birch',
+                startTime: now,
+                waterBonusDays: 0,
+                waterCount: 0
+            }
+        };
 
-      <div class="disclaimer">科普说明：恢复时间轴参考 WHO/NHS 公开资料，仅供自我激励，不替代专业医疗建议。</div>
-    `;
-  }
+        saveState();
+        showMainView();
+        showToast('🌱 已认领第 1 株生命树苗「希望白桦」，进度已自动保存');
+    }
 
-  root.innerHTML += `
-    <div class="bottom-nav">
-      <button class="nav-btn ${state.activeTab === "tree" ? "active" : ""}" onclick="switchTab('tree')">🌱 生命树苗</button>
-      <button class="nav-btn ${state.activeTab === "forest" ? "active" : ""}" onclick="switchTab('forest')">🌳 生命森林 (${state.forestTrees.length})</button>
-    </div>
-  `;
-}
+    // ==================== 2. 科学恢复度与数据计算 ====================
+    function getTotalQuitSeconds() {
+        const realSec = Math.floor((Date.now() - appState.totalStartTime) / 1000);
+        return Math.max(0, realSec);
+    }
 
-function onOnboardingInput(type, val) {
-  if (type === "years") {
-    state.yearsSmoked = Number(val);
-    document.getElementById("yearsLabel").textContent = `${state.yearsSmoked} 年`;
-  } else {
-    state.cigsPerDay = Number(val);
-    document.getElementById("cigsLabel").textContent = `${state.cigsPerDay} 支/天`;
-  }
-  const startPct = initialHealthStart();
-  const previewStage = treeStageInfo(startPct);
-  document.getElementById("previewBox").innerHTML = `
-    ${renderTreeSVG(previewStage.stage, state.currentSpeciesId, true)}
-    <div>
-      <span class="badge ${previewStage.badgeClass}">${previewStage.name}</span>
-      <div style="font-weight:700;font-size:14px;margin-top:4px;">初始健康指数约 ${startPct}%</div>
-      <div class="sub" style="font-size:12px;">${previewStage.status}</div>
-    </div>
-  `;
-}
+    function getCurrentTreeEffectiveDays() {
+        const ct = appState.currentTree;
+        const realSec = Math.floor((Date.now() - ct.startTime) / 1000);
+        const elapsedDays = Math.max(0, realSec) / 86400;
+        return elapsedDays + (ct.waterBonusDays || 0);
+    }
 
-function petTree() {
-  const wrap = document.getElementById("treeWrap");
-  if (!wrap) return;
-  wrap.classList.remove("bounce");
-  void wrap.offsetWidth;
-  wrap.classList.add("bounce");
-  const toast = document.getElementById("toastMsg");
-  if (toast) toast.textContent = "树叶轻轻颤动了一下，每一次忍住烟瘾都在滋养它。";
-}
+    function getCurrentTreeRecoveryPct() {
+        const effDays = getCurrentTreeEffectiveDays();
+        const basePct = appState.currentTree.index > 1 ? 25 : appState.initialHealthPct;
+        const progressRatio = Math.min(1, effDays / DAYS_PER_TREE);
+        const easedRatio = Math.pow(progressRatio, 0.88);
+        const pct = basePct + (100 - basePct) * easedRatio;
+        return Math.min(100, Number(pct.toFixed(1)));
+    }
 
-function switchTab(tab) {
-  state.activeTab = tab;
-  state.selectedForestTreeIdx = null;
-  saveState();
-  render();
-}
+    function getVisualStageByPct(pct) {
+        for (let i = VISUAL_STAGES.length - 1; i >= 0; i--) {
+            if (pct >= VISUAL_STAGES[i].minPct) {
+                return VISUAL_STAGES[i];
+            }
+        }
+        return VISUAL_STAGES[0];
+    }
 
-function selectForestTree(idx) {
-  state.selectedForestTreeIdx = idx;
-  render();
-}
+    function getSpeciesById(id) {
+        return TREE_SPECIES.find(s => s.id === id) || TREE_SPECIES[0];
+    }
 
-// 每秒刷新冷却倒计时与无烟时长
-setInterval(() => {
-  if (!state.onboarded || state.activeTab !== "tree") return;
-  const cdMs = getWaterCooldownRemainingMs();
-  const titleEl = document.getElementById("waterBtnTitle");
-  const subEl = document.getElementById("waterSubNote");
-  const btnEl = document.getElementById("waterBtn");
-  if (!titleEl || !subEl || !btnEl) return;
+    // ==================== 3. 主界面渲染与实时更新 ====================
+    function showMainView() {
+        document.getElementById('view-onboarding').classList.add('hidden');
+        document.getElementById('view-main').classList.remove('hidden');
+        document.getElementById('btn-reset-top').classList.remove('hidden');
 
-  if (cdMs > 0) {
-    titleEl.textContent = "⏳ 冷却吸收中";
-    subEl.textContent = `还剩 ${formatDuration(cdMs)}`;
-    btnEl.disabled = true;
-  } else if (btnEl.disabled && (state.waterCountToday < DAILY_WATER_LIMIT || state.bonusWater > 0)) {
-    render();
-  }
-}, 1000);
+        renderAllMainData();
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(updateRealtimeStats, 1000);
+    }
 
-render();
+    function renderAllMainData() {
+        updateRealtimeStats();
+        updateTreeVisuals(true);
+        updateActionButtons();
+        renderClinicalTimeline();
+        renderForestView();
+    }
+
+    function updateRealtimeStats() {
+        if (ensureDailyWaterReset()) {
+            updateActionButtons();
+        } else {
+            updateWaterButtonState();
+        }
+
+        const totalSec = getTotalQuitSeconds();
+        const totalMins = totalSec / 60;
+        const totalDays = totalSec / 86400;
+
+        const days = Math.floor(totalSec / 86400);
+        const hours = Math.floor((totalSec % 86400) / 3600);
+        const mins = Math.floor((totalSec % 3600) / 60);
+        const secs = totalSec % 60;
+
+        document.getElementById('timer-days').textContent = days;
+        document.getElementById('timer-hours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('timer-mins').textContent = String(mins).padStart(2, '0');
+        document.getElementById('timer-secs').textContent = String(secs).padStart(2, '0');
+
+        const cigsAvoided = totalDays * appState.cigsPerDay;
+        const moneySaved = (cigsAvoided / 20) * appState.packPrice;
+        const lifeSavedMins = Math.floor(cigsAvoided * 11);
+
+        document.getElementById('stat-cigs').textContent = Math.floor(cigsAvoided);
+        document.getElementById('stat-money').textContent = moneySaved.toFixed(1);
+        document.getElementById('stat-life').textContent = lifeSavedMins >= 1440
+            ? `${(lifeSavedMins / 1440).toFixed(1)}天`
+            : `${lifeSavedMins}分`;
+
+        const coPct = Math.min(100, Math.round((totalMins / 720) * 100));
+        document.getElementById('med-co-val').textContent = `${coPct}%`;
+        document.getElementById('med-co-bar').style.width = `${coPct}%`;
+
+        const ciliaPct = Math.min(100, Number(((totalDays / 270) * 100).toFixed(1)));
+        document.getElementById('med-cilia-val').textContent = `${ciliaPct.toFixed(1)}%`;
+        document.getElementById('med-cilia-bar').style.width = `${ciliaPct}%`;
+
+        const lungBoost = Math.min(30, Number(((totalDays / 90) * 30).toFixed(1)));
+        document.getElementById('med-lung-val').textContent = `+${lungBoost.toFixed(1)}%`;
+        document.getElementById('med-lung-bar').style.width = `${(lungBoost / 30) * 100}%`;
+
+        const heartDrop = Math.min(50, Number(((totalDays / 365) * 50).toFixed(1)));
+        document.getElementById('med-heart-val').textContent = `-${heartDrop.toFixed(1)}%`;
+        document.getElementById('med-heart-bar').style.width = `${(heartDrop / 50) * 100}%`;
+
+        let currentClinical = CLINICAL_TIMELINE[0];
+        for (let i = CLINICAL_TIMELINE.length - 1; i >= 0; i--) {
+            if (totalMins >= CLINICAL_TIMELINE[i].mins) {
+                currentClinical = CLINICAL_TIMELINE[i];
+                break;
+            }
+        }
+        document.getElementById('clinical-stage-title').textContent = `当前医学节点 [${currentClinical.label}]：${currentClinical.title}`;
+        document.getElementById('clinical-stage-desc').textContent = currentClinical.desc;
+    }
+
+    function updateTreeVisuals(forceReRender = false) {
+        const ct = appState.currentTree;
+        const species = getSpeciesById(ct.speciesId);
+        const pct = getCurrentTreeRecoveryPct();
+        const stage = getVisualStageByPct(pct);
+        const effDays = Math.min(DAYS_PER_TREE, getCurrentTreeEffectiveDays());
+
+        document.getElementById('tree-order-pill').textContent = `第 ${ct.index} 株 · ${species.name}`;
+        
+        const stageBg = document.getElementById('tree-stage-bg');
+        stageBg.className = `relative rounded-3xl p-4 transition-all duration-700 overflow-hidden border border-white/70 shadow-sm bg-gradient-to-b ${stage.bgGradient}`;
+
+        const badge = document.getElementById('stage-badge');
+        badge.textContent = stage.name;
+        badge.className = `px-2.5 py-0.5 rounded-full text-xs font-bold shadow-2xs ${stage.badgeClass}`;
+
+        document.getElementById('tree-recovery-pct-badge').textContent = `${pct.toFixed(1)}%`;
+        document.getElementById('tree-mood-text').textContent = stage.mood;
+
+        document.getElementById('tree-days-progress-text').textContent = `${effDays.toFixed(1)} / ${DAYS_PER_TREE} 天`;
+        document.getElementById('tree-water-bonus-text').textContent = `甘露加速 +${(ct.waterBonusDays || 0).toFixed(1)}天`;
+        document.getElementById('total-water-lifetime').textContent = `本株浇水 ${ct.waterCount || 0} 次`;
+        document.getElementById('stage-progress-bar').style.width = `${pct}%`;
+
+        const isFullMature = pct >= 100;
+        const matureBanner = document.getElementById('tree-mature-banner');
+        const forestShortcut = document.getElementById('forest-unlock-shortcut');
+        const navDot = document.getElementById('nav-forest-dot');
+
+        if (isFullMature) {
+            matureBanner.classList.remove('hidden');
+            forestShortcut.classList.remove('hidden');
+            navDot.classList.remove('hidden');
+        } else {
+            matureBanner.classList.add('hidden');
+            forestShortcut.classList.add('hidden');
+            navDot.classList.add('hidden');
+        }
+
+        if (forceReRender || lastRenderedStageId !== stage.id || lastRenderedSpeciesId !== species.id) {
+            document.getElementById('main-tree-svg-wrapper').innerHTML = generateTreeSVG(stage.id, species.id);
+            lastRenderedStageId = stage.id;
+            lastRenderedSpeciesId = species.id;
+        }
+    }
+
+    function updateActionButtons() {
+        ensureDailyWaterReset();
+        const todayStr = new Date().toDateString();
+        const isCheckedToday = appState.lastCheckInDate === todayStr;
+
+        const btnCheckin = document.getElementById('btn-checkin');
+        const titleEl = document.getElementById('checkin-title');
+        const subEl = document.getElementById('checkin-sub');
+        document.getElementById('streak-badge').textContent = `已连签 ${appState.streakDays} 天`;
+
+        if (isCheckedToday) {
+            btnCheckin.className = 'p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex flex-col justify-between text-left transition';
+            titleEl.textContent = '今日已打卡 ✓';
+            subEl.textContent = '阳光已洒满树冠';
+            subEl.className = 'text-[11px] text-emerald-600 mt-0.5';
+        } else {
+            btnCheckin.className = 'p-3.5 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 flex flex-col justify-between text-left transition active:scale-[0.97]';
+            titleEl.textContent = '今日戒烟打卡';
+            subEl.textContent = '加速树苗生长 (+1.5天效)';
+            subEl.className = 'text-[11px] text-emerald-100 mt-0.5';
+        }
+
+        updateWaterButtonState();
+    }
+
+    function formatCooldownHMS(ms) {
+        const totalSec = Math.max(0, Math.ceil(ms / 1000));
+        const hh = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+        const mm = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+        const ss = String(totalSec % 60).padStart(2, '0');
+        return `${hh}:${mm}:${ss}`;
+    }
+
+    function getWateringStatus() {
+        ensureDailyWaterReset();
+        const w = appState.watering;
+        const maxToday = DAILY_WATER_MAX + (w.bonusQuota || 0);
+        const usedToday = w.todayCount || 0;
+        const remainingQuota = Math.max(0, maxToday - usedToday);
+
+        const now = Date.now();
+        const elapsedSinceLast = now - (w.lastWaterTimestamp || 0);
+        const cooldownRemainingMs = w.lastWaterTimestamp > 0 ? Math.max(0, WATER_COOLDOWN_MS - elapsedSinceLast) : 0;
+
+        return {
+            usedToday,
+            maxToday,
+            remainingQuota,
+            isMaxedOut: remainingQuota <= 0,
+            isCoolingDown: cooldownRemainingMs > 0,
+            cooldownRemainingMs
+        };
+    }
+
+    function updateWaterButtonState() {
+        const status = getWateringStatus();
+        const btnWater = document.getElementById('btn-water');
+        const iconEl = document.getElementById('water-icon');
+        const badgeEl = document.getElementById('water-quota-badge');
+        const titleEl = document.getElementById('water-title');
+        const subEl = document.getElementById('water-sub');
+
+        if (!btnWater) return;
+
+        badgeEl.textContent = `今日甘露 ${status.usedToday}/${status.maxToday}`;
+
+        if (status.isMaxedOut) {
+            btnWater.className = 'p-3.5 rounded-2xl bg-slate-100 border border-slate-200 text-slate-500 flex flex-col justify-between text-left transition cursor-not-allowed';
+            iconEl.className = 'w-8 h-8 rounded-xl bg-slate-200/80 flex items-center justify-center text-base';
+            iconEl.textContent = '🌙';
+            badgeEl.className = 'text-[10px] font-bold bg-slate-200/80 text-slate-600 px-2 py-0.5 rounded-full tabular-nums';
+            titleEl.textContent = '今日已饱饮';
+            subEl.textContent = '明日0点恢复甘露额度';
+            subEl.className = 'text-[11px] text-slate-400 mt-0.5';
+        } else if (status.isCoolingDown) {
+            btnWater.className = 'p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 flex flex-col justify-between text-left transition cursor-not-allowed';
+            iconEl.className = 'w-8 h-8 rounded-xl bg-sky-100 flex items-center justify-center text-base';
+            iconEl.textContent = '⏳';
+            badgeEl.className = 'text-[10px] font-bold bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full tabular-nums';
+            titleEl.textContent = '根系吸收中';
+            subEl.textContent = `冷却 ${formatCooldownHMS(status.cooldownRemainingMs)}`;
+            subEl.className = 'text-[11px] text-sky-600 font-semibold mt-0.5 tabular-nums';
+        } else {
+            btnWater.className = 'p-3.5 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/20 flex flex-col justify-between text-left transition active:scale-[0.97]';
+            iconEl.className = 'w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-base';
+            iconEl.textContent = '💧';
+            badgeEl.className = 'text-[10px] font-bold bg-black/15 text-white px-2 py-0.5 rounded-full tabular-nums';
+            titleEl.textContent = '给树苗浇水';
+            subEl.textContent = '甘露滋润 (+0.5天效)';
+            subEl.className = 'text-[11px] text-sky-100 mt-0.5';
+        }
+    }
+
+    // ==================== 4. 打卡、浇水与解锁新树种 ====================
+    function dailyCheckIn() {
+        const todayStr = new Date().toDateString();
+        if (appState.lastCheckInDate === todayStr) {
+            showToast('☀️ 今天已经打过卡啦，明天继续加油！');
+            triggerTreeHappyBounce();
+            return;
+        }
+
+        const prevPct = getCurrentTreeRecoveryPct();
+        appState.lastCheckInDate = todayStr;
+        appState.streakDays += 1;
+        appState.currentTree.waterBonusDays += 1.5;
+        saveState();
+
+        updateActionButtons();
+        updateTreeVisuals();
+        renderForestView();
+        triggerTreeHappyBounce();
+
+        const randomQuote = ENCOURAGE_QUOTES[Math.floor(Math.random() * ENCOURAGE_QUOTES.length)];
+        document.getElementById('checkin-quote').textContent = `“${randomQuote}”`;
+        document.getElementById('modal-streak-num').textContent = appState.streakDays;
+        document.getElementById('modal-checkin').classList.remove('hidden');
+
+        checkNewlyMatured(prevPct);
+    }
+
+    function closeCheckinModal() {
+        document.getElementById('modal-checkin').classList.add('hidden');
+    }
+
+    function waterTree() {
+        const status = getWateringStatus();
+
+        if (status.isMaxedOut) {
+            showToast(`🌙 今日甘露已达上限 (${status.usedToday}/${status.maxToday})，过量浇水会伤根哦~`);
+            return;
+        }
+
+        if (status.isCoolingDown) {
+            showToast(`⏳ 树苗正在吸收上一份水分，请 ${formatCooldownHMS(status.cooldownRemainingMs)} 后再来`);
+            return;
+        }
+
+        const prevPct = getCurrentTreeRecoveryPct();
+        appState.watering.todayCount += 1;
+        appState.watering.lastWaterTimestamp = Date.now();
+        appState.currentTree.waterCount += 1;
+        appState.currentTree.waterBonusDays += 0.5;
+        saveState();
+
+        spawnWaterDrops();
+        triggerTreeHappyBounce();
+        updateActionButtons();
+        updateTreeVisuals();
+        renderForestView();
+
+        const nextStatus = getWateringStatus();
+        if (!checkNewlyMatured(prevPct)) {
+            if (nextStatus.isMaxedOut) {
+                showToast(`💧 浇水成功！今日甘露已全部滋润 (${nextStatus.usedToday}/${nextStatus.maxToday})`);
+            } else {
+                showToast(`💧 浇水成功！恢复加速 +0.5天，下次浇水需间隔 2 小时`);
+            }
+        }
+    }
+
+    function checkNewlyMatured(prevPct) {
+        const newPct = getCurrentTreeRecoveryPct();
+        if (prevPct < 100 && newPct >= 100) {
+            triggerTreeHappyBounce();
+            showToast('🎉 恭喜！本株生命树达成 100% 肺部焕新满级！');
+            setTimeout(() => {
+                openUnlockNextTreeModal();
+            }, 650);
+            return true;
+        }
+        return false;
+    }
+
+    function openUnlockNextTreeModal() {
+        const nextIndex = appState.currentTree.index + 1;
+        const usedIds = [
+            ...appState.forestTrees.map(t => t.speciesId),
+            appState.currentTree.speciesId
+        ];
+        const unplanted = TREE_SPECIES.find(s => !usedIds.includes(s.id));
+        selectedNextSpeciesId = unplanted ? unplanted.id : TREE_SPECIES[(nextIndex - 1) % TREE_SPECIES.length].id;
+
+        renderSpeciesSelector();
+        document.getElementById('modal-unlock-tree').classList.remove('hidden');
+    }
+
+    function closeUnlockNextTreeModal() {
+        document.getElementById('modal-unlock-tree').classList.add('hidden');
+    }
+
+    function renderSpeciesSelector() {
+        const listEl = document.getElementById('species-selector-list');
+        listEl.innerHTML = TREE_SPECIES.map(sp => {
+            const isSelected = sp.id === selectedNextSpeciesId;
+            return `
+                <div onclick="selectNextSpecies('${sp.id}')" class="p-3 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
+                    isSelected 
+                        ? 'border-emerald-500 bg-emerald-50/70 shadow-xs' 
+                        : 'border-slate-100 bg-slate-50/60 hover:bg-white'
+                }">
+                    <div class="w-14 h-14 rounded-xl bg-white border border-slate-100 flex items-center justify-center shrink-0">
+                        ${generateTreeSVG(5, sp.id)}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-extrabold text-slate-800">${sp.name}</span>
+                            <span class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[9px] font-semibold text-slate-500">${sp.tag}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">${sp.desc}</p>
+                    </div>
+                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        isSelected ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-300'
+                    }">
+                        ${isSelected ? '<span class="text-[10px] font-bold">✓</span>' : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function selectNextSpecies(id) {
+        selectedNextSpeciesId = id;
+        renderSpeciesSelector();
+    }
+
+    function confirmPlantNextTree() {
+        const ct = appState.currentTree;
+        const species = getSpeciesById(ct.speciesId);
+
+        const cigsSavedThisTree = Math.round(DAYS_PER_TREE * appState.cigsPerDay);
+        const moneySavedThisTree = Math.round((cigsSavedThisTree / 20) * appState.packPrice);
+
+        appState.forestTrees.push({
+            index: ct.index,
+            speciesId: ct.speciesId,
+            speciesName: species.name,
+            plantedDate: new Date(ct.startTime).toLocaleDateString('zh-CN'),
+            completedDate: new Date().toLocaleDateString('zh-CN'),
+            daysGuarded: DAYS_PER_TREE,
+            cigsAvoided: cigsSavedThisTree,
+            moneySaved: moneySavedThisTree
+        });
+
+        const nextIndex = ct.index + 1;
+        appState.currentTree = {
+            index: nextIndex,
+            speciesId: selectedNextSpeciesId,
+            startTime: Date.now(),
+            waterBonusDays: 0,
+            waterCount: 0
+        };
+
+        saveState();
+        closeUnlockNextTreeModal();
+
+        const nextSpecies = getSpeciesById(selectedNextSpeciesId);
+        updateActionButtons();
+        updateTreeVisuals(true);
+        renderForestView();
+
+        showToast(`🌳 第${ct.index}棵大树已入驻森林！第${nextIndex}株「${nextSpecies.name}」已种下！`);
+    }
+
+    // ==================== 5. 「我的生命森林」全景渲染 ====================
+    function renderForestView() {
+        const matureTrees = appState.forestTrees || [];
+        const currentTree = appState.currentTree;
+        const currentPct = getCurrentTreeRecoveryPct();
+        const currentStage = getVisualStageByPct(currentPct);
+
+        document.getElementById('forest-mature-count').textContent = matureTrees.length;
+
+        const levelBadge = document.getElementById('forest-level-badge');
+        const ecoText = document.getElementById('forest-eco-text');
+        const eco1 = document.getElementById('eco-card-1');
+        const eco2 = document.getElementById('eco-card-2');
+        const eco3 = document.getElementById('eco-card-3');
+
+        if (matureTrees.length >= 2) {
+            levelBadge.textContent = '彩虹秘境森林';
+            ecoText.textContent = '木屋 · 彩虹 · 灵鹿 · 溪流';
+            eco1.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
+            eco2.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
+            eco3.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
+        } else if (matureTrees.length >= 1) {
+            levelBadge.textContent = '灵鹿溪谷森林';
+            ecoText.textContent = '溪流 · 林间小鹿 · 蝴蝶';
+            eco1.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
+            eco2.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
+            eco3.className = 'p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-60';
+        } else {
+            levelBadge.textContent = '初生希望草甸';
+            ecoText.textContent = '阳光草地 · 蝴蝶';
+            eco1.className = 'p-2.5 rounded-2xl border bg-emerald-50/70 border-emerald-200';
+            eco2.className = 'p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-60';
+            eco3.className = 'p-2.5 rounded-2xl border bg-slate-50 border-slate-100 opacity-60';
+        }
+
+        const allDisplayTrees = [
+            ...matureTrees.map(t => ({
+                ...t,
+                isMature: true,
+                stageId: 5,
+                pct: 100
+            })),
+            {
+                index: currentTree.index,
+                speciesId: currentTree.speciesId,
+                speciesName: getSpeciesById(currentTree.speciesId).name,
+                isMature: false,
+                stageId: currentStage.id,
+                pct: currentPct
+            }
+        ];
+
+        const spots = [
+            { x: 185, y: 215, scale: 0.72 },
+            { x: 95,  y: 195, scale: 0.64 },
+            { x: 280, y: 200, scale: 0.65 },
+            { x: 135, y: 255, scale: 0.76 },
+            { x: 245, y: 258, scale: 0.75 }
+        ];
+
+        const rainbowSvg = matureTrees.length >= 2 ? `
+            <path d="M30 160 A 160 120 0 0 1 350 160" fill="none" stroke="#f43f5e" stroke-width="5" opacity="0.28"/>
+            <path d="M36 160 A 154 114 0 0 1 344 160" fill="none" stroke="#fbbf24" stroke-width="5" opacity="0.28"/>
+            <path d="M42 160 A 148 108 0 0 1 338 160" fill="none" stroke="#34d399" stroke-width="5" opacity="0.28"/>
+            <path d="M48 160 A 142 102 0 0 1 332 160" fill="none" stroke="#38bdf8" stroke-width="5" opacity="0.28"/>
+        ` : '';
+
+        const streamSvg = matureTrees.length >= 1 ? `
+            <path d="M0 245 Q110 230 185 262 T380 285 L380 310 L0 310 Z" fill="#7dd3fc" opacity="0.65"/>
+            <path d="M20 255 Q110 242 175 268" stroke="#e0f2fe" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <g transform="translate(52, 212)">
+                <ellipse cx="0" cy="8" rx="9" ry="5" fill="#d97706"/>
+                <rect x="-6" y="11" width="2" height="8" fill="#b45309"/>
+                <rect x="4" y="11" width="2" height="8" fill="#b45309"/>
+                <circle cx="8" cy="1" r="4" fill="#f59e0b"/>
+                <path d="M7 -3 L5 -8 M9 -3 L11 -8" stroke="#78350f" stroke-width="1.3" stroke-linecap="round"/>
+                <circle cx="9.5" cy="0.5" r="0.8" fill="#1e293b"/>
+            </g>
+        ` : '';
+
+        const cabinSvg = matureTrees.length >= 2 ? `
+            <g transform="translate(318, 152)">
+                <rect x="-14" y="0" width="28" height="20" rx="2" fill="#fef3c7" stroke="#92400e" stroke-width="1.5"/>
+                <polygon points="-18,0 0,-14 18,0" fill="#ea580c"/>
+                <rect x="-4" y="8" width="8" height="12" fill="#78350f"/>
+                <circle cx="0" cy="-5" r="2.5" fill="#fde047"/>
+            </g>
+        ` : '';
+
+        const treesInPanorama = allDisplayTrees.slice(-5).map((tree, idx) => {
+            const spot = spots[idx % spots.length];
+            const sp = getSpeciesById(tree.speciesId);
+            const innerTree = getMiniTreeGraphic(tree.stageId, sp);
+            const labelBg = tree.isMature ? '#059669' : '#d97706';
+            const labelText = tree.isMature ? `第${tree.index}株·已成林` : `第${tree.index}株·${tree.pct.toFixed(0)}%`;
+
+            return `
+                <g onclick="openTreePlaqueModal(${tree.index})" class="cursor-pointer hover:opacity-90 transition" transform="translate(${spot.x}, ${spot.y}) scale(${spot.scale})">
+                    <ellipse cx="0" cy="8" rx="34" ry="10" fill="#15803d" opacity="0.22"/>
+                    ${innerTree}
+                    <g transform="translate(0, 22)">
+                        <rect x="-38" y="-9" width="76" height="18" rx="9" fill="${labelBg}" opacity="0.92"/>
+                        <text x="0" y="3" text-anchor="middle" fill="#ffffff" font-size="9.5" font-weight="bold">${labelText}</text>
+                    </g>
+                </g>
+            `;
+        }).join('');
+
+        document.getElementById('forest-panorama-container').innerHTML = `
+            <svg viewBox="0 0 380 310" class="w-full h-full">
+                <circle cx="325" cy="48" r="22" fill="#fde047" opacity="0.6"/>
+                <circle cx="325" cy="48" r="14" fill="#facc15"/>
+                <g class="cloud-float" fill="#ffffff" opacity="0.85">
+                    <circle cx="75" cy="52" r="14"/><circle cx="92" cy="48" r="18"/><circle cx="110" cy="53" r="13"/>
+                </g>
+                ${rainbowSvg}
+                <path d="M-20 175 Q85 110 190 170 T400 165 L400 310 L-20 310 Z" fill="#86efac" opacity="0.65"/>
+                <path d="M-20 195 Q130 140 250 185 T400 180 L400 310 L-20 310 Z" fill="#4ade80" opacity="0.75"/>
+                <path d="M-20 210 Q190 175 400 215 L400 310 L-20 310 Z" fill="#22c55e" opacity="0.35"/>
+                ${streamSvg}
+                ${cabinSvg}
+                <g class="butterfly-float" transform="translate(150, 145)">
+                    <path d="M0 0 Q-6 -6 -8 0 Q-6 5 0 1.5 Z" fill="#f472b6"/>
+                    <path d="M0 0 Q6 -6 8 0 Q6 5 0 1.5 Z" fill="#fb7185"/>
+                </g>
+                ${treesInPanorama}
+            </svg>
+        `;
+
+        const cardsListEl = document.getElementById('forest-tree-cards-list');
+        cardsListEl.innerHTML = allDisplayTrees.slice().reverse().map(t => {
+            const sp = getSpeciesById(t.speciesId);
+            return `
+                <div onclick="openTreePlaqueModal(${t.index})" class="bg-white rounded-2xl p-3 border border-slate-100 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-emerald-200 transition">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50/70 border border-emerald-100 flex items-center justify-center shrink-0">
+                        ${generateTreeSVG(t.stageId, t.speciesId)}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-extrabold text-slate-800">第 ${t.index} 株 · ${sp.name}</span>
+                            ${t.isMature 
+                                ? '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">100% 已成林</span>' 
+                                : `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">培育中 ${t.pct.toFixed(1)}%</span>`
+                            }
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-0.5 truncate">${sp.desc}</p>
+                    </div>
+                    <span class="text-slate-300 text-xs">›</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function getMiniTreeGraphic(stageId, species) {
+        const [c1, c2, c3] = species.crownColors;
+        if (stageId <= 1) {
+            return `
+                <path d="M0 6 Q-3 -15 6 -30" stroke="#856852" stroke-width="4" stroke-linecap="round" fill="none"/>
+                <path d="M6 -30 Q16 -28 18 -18 Q8 -20 6 -30 Z" fill="#ca8a04"/>
+            `;
+        }
+        if (stageId <= 3) {
+            return `
+                <rect x="-4" y="-36" width="8" height="42" rx="3" fill="${species.trunkColor}"/>
+                <circle cx="-14" cy="-36" r="16" fill="${c1}"/>
+                <circle cx="14" cy="-36" r="16" fill="${c2}"/>
+                <circle cx="0" cy="-52" r="22" fill="${c3}"/>
+            `;
+        }
+        return `
+            <circle cx="0" cy="-54" r="44" fill="#fef08a" opacity="0.35"/>
+            <rect x="-6" y="-44" width="12" height="50" rx="4" fill="${species.trunkColor}"/>
+            <circle cx="-22" cy="-42" r="22" fill="${c1}"/>
+            <circle cx="22" cy="-42" r="22" fill="${c1}"/>
+            <circle cx="-12" cy="-64" r="24" fill="${c2}"/>
+            <circle cx="12" cy="-64" r="24" fill="${c2}"/>
+            <circle cx="0" cy="-76" r="26" fill="${c3}"/>
+            <circle cx="-14" cy="-44" r="3.5" fill="${species.fruitColor}"/>
+            <circle cx="16" cy="-58" r="3.5" fill="${species.fruitColor}"/>
+            <circle cx="0" cy="-78" r="4" fill="${species.fruitColor}"/>
+        `;
+    }
+
+    function openTreePlaqueModal(treeIndex) {
+        const mature = appState.forestTrees.find(t => t.index === treeIndex);
+        const isCurrent = appState.currentTree.index === treeIndex;
+
+        let speciesId, title, badgeText, subtitle, days, cigs, money, stageId, desc;
+
+        if (mature) {
+            speciesId = mature.speciesId;
+            title = mature.speciesName;
+            badgeText = `第 ${mature.index} 株 · 100% 满级参天大树`;
+            subtitle = `认领于 ${mature.plantedDate} · 成林于 ${mature.completedDate}`;
+            days = `${mature.daysGuarded} 天`;
+            cigs = `${mature.cigsAvoided.toLocaleString()} 支`;
+            money = `¥${mature.moneySaved.toLocaleString()}`;
+            stageId = 5;
+            desc = `“你用整整一年的坚持唤醒了这棵${mature.speciesName}，它永远守护着你的生命森林。”`;
+        } else if (isCurrent) {
+            const ct = appState.currentTree;
+            const sp = getSpeciesById(ct.speciesId);
+            const pct = getCurrentTreeRecoveryPct();
+            const effDays = getCurrentTreeEffectiveDays();
+            const cigsNum = Math.floor(effDays * appState.cigsPerDay);
+            const moneyNum = Math.round((cigsNum / 20) * appState.packPrice);
+
+            speciesId = ct.speciesId;
+            title = sp.name;
+            badgeText = `第 ${ct.index} 株 · 正在培育 (${pct.toFixed(1)}%)`;
+            subtitle = `认领于 ${new Date(ct.startTime).toLocaleDateString('zh-CN')}`;
+            days = `${effDays.toFixed(1)} 天`;
+            cigs = `${cigsNum.toLocaleString()} 支`;
+            money = `¥${moneyNum.toLocaleString()}`;
+            stageId = getVisualStageByPct(pct).id;
+            desc = sp.desc;
+        } else {
+            return;
+        }
+
+        document.getElementById('plaque-badge').textContent = badgeText;
+        document.getElementById('plaque-title').textContent = title;
+        document.getElementById('plaque-subtitle').textContent = subtitle;
+        document.getElementById('plaque-svg-box').innerHTML = generateTreeSVG(stageId, speciesId);
+        document.getElementById('plaque-days').textContent = days;
+        document.getElementById('plaque-cigs').textContent = cigs;
+        document.getElementById('plaque-money').textContent = money;
+        document.getElementById('plaque-desc').textContent = desc;
+
+        document.getElementById('modal-tree-plaque').classList.remove('hidden');
+    }
+
+    function closeTreePlaqueModal() {
+        document.getElementById('modal-tree-plaque').classList.add('hidden');
+    }
+
+    // ==================== 6. 医学时间轴渲染 ====================
+    function renderClinicalTimeline() {
+        const elapsedMins = getTotalQuitSeconds() / 60;
+        const timelineEl = document.getElementById('health-timeline-list');
+
+        timelineEl.innerHTML = CLINICAL_TIMELINE.map(item => {
+            const achieved = elapsedMins >= item.mins;
+            const progress = Math.min(100, Math.round((elapsedMins / item.mins) * 100));
+
+            return `
+                <div class="relative pl-9">
+                    <div class="absolute left-0 top-1 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 z-10 ${
+                        achieved 
+                            ? 'bg-emerald-500 border-emerald-200 text-white shadow-xs' 
+                            : 'bg-white border-slate-200 text-slate-400'
+                    }">
+                        ${achieved ? '✓' : '⏳'}
+                    </div>
+                    <div class="bg-white rounded-2xl p-3.5 border ${achieved ? 'border-emerald-200 shadow-2xs' : 'border-slate-100'}">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="text-xs font-extrabold ${achieved ? 'text-slate-800' : 'text-slate-600'}">${item.title}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                                achieved ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'
+                            }">${item.label}</span>
+                        </div>
+                        <div class="inline-block text-[10px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md mb-1.5">
+                            🌱 树苗映射：${item.treeLink}
+                        </div>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">${item.desc}</p>
+                        ${!achieved ? `
+                            <div class="mt-2 flex items-center gap-2">
+                                <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-emerald-400 rounded-full" style="width: ${progress}%"></div>
+                                </div>
+                                <span class="text-[10px] text-slate-400 font-semibold">${progress}%</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ==================== 7. 烟瘾深呼吸急救 & 互动特效 ====================
+    function petTreeInteraction() {
+        triggerTreeHappyBounce();
+        spawnFallingLeaf();
+
+        const bubble = document.getElementById('tree-speech-bubble');
+        const quote = ENCOURAGE_QUOTES[Math.floor(Math.random() * ENCOURAGE_QUOTES.length)];
+        bubble.textContent = quote;
+        bubble.classList.remove('opacity-0', '-translate-y-1');
+        bubble.classList.add('opacity-100', 'translate-y-0');
+
+        clearTimeout(window.bubbleTimer);
+        window.bubbleTimer = setTimeout(() => {
+            bubble.classList.add('opacity-0', '-translate-y-1');
+            bubble.classList.remove('opacity-100', 'translate-y-0');
+        }, 2800);
+    }
+
+    function triggerTreeHappyBounce() {
+        const treeGroup = document.querySelector('#main-tree-svg-wrapper .tree-anim-target');
+        if (!treeGroup) return;
+        const origClass = treeGroup.getAttribute('data-base-class');
+        treeGroup.setAttribute('class', 'tree-anim-target tree-happy');
+        setTimeout(() => {
+            treeGroup.setAttribute('class', `tree-anim-target ${origClass}`);
+        }, 780);
+    }
+
+    function spawnWaterDrops() {
+        const fxLayer = document.getElementById('fx-layer');
+        [0, 1, 2].forEach((idx) => {
+            setTimeout(() => {
+                const drop = document.createElement('div');
+                drop.innerHTML = '💧';
+                drop.className = 'absolute text-lg water-drop-anim';
+                drop.style.left = `calc(50% + ${(idx - 1) * 28}px)`;
+                drop.style.top = '40px';
+                fxLayer.appendChild(drop);
+                setTimeout(() => drop.remove(), 850);
+            }, idx * 110);
+        });
+    }
+
+    function spawnFallingLeaf() {
+        const fxLayer = document.getElementById('fx-layer');
+        const leaf = document.createElement('div');
+        leaf.innerHTML = lastRenderedStageId === 1 ? '🍂' : (lastRenderedSpeciesId === 'sakura' ? '🌸' : '🍃');
+        leaf.className = 'absolute text-base falling-leaf-anim';
+        leaf.style.left = `calc(50% + ${(Math.random() * 40 - 20)}px)`;
+        leaf.style.top = '70px';
+        fxLayer.appendChild(leaf);
+        setTimeout(() => leaf.remove(), 1650);
+    }
+
+    function openCravingModal() {
+        breathSecondsLeft = 60;
+        document.getElementById('breath-countdown').textContent = breathSecondsLeft;
+        document.getElementById('modal-craving').classList.remove('hidden');
+
+        if (breathInterval) clearInterval(breathInterval);
+        breathInterval = setInterval(() => {
+            breathSecondsLeft -= 1;
+            if (breathSecondsLeft <= 0) {
+                completeCravingEarly();
+                return;
+            }
+            document.getElementById('breath-countdown').textContent = breathSecondsLeft;
+            const cycle = (60 - breathSecondsLeft) % 8;
+            if (cycle < 4) {
+                document.getElementById('breath-phase').textContent = '缓缓吸气...';
+                document.getElementById('breath-guide-text').textContent = '用鼻腔深深吸气，感受纯净氧气充盈肺部…';
+            } else {
+                document.getElementById('breath-phase').textContent = '慢慢呼气...';
+                document.getElementById('breath-guide-text').textContent = '放松双肩，把焦虑与烟瘾随着浊气一起呼出…';
+            }
+        }, 1000);
+    }
+
+    function closeCravingModal() {
+        if (breathInterval) clearInterval(breathInterval);
+        document.getElementById('modal-craving').classList.add('hidden');
+    }
+
+    function completeCravingEarly() {
+        closeCravingModal();
+        const prevPct = getCurrentTreeRecoveryPct();
+
+        ensureDailyWaterReset();
+        const status = getWateringStatus();
+        if (status.isMaxedOut) {
+            appState.watering.bonusQuota = (appState.watering.bonusQuota || 0) + 1;
+        }
+        appState.watering.lastWaterTimestamp = 0;
+        appState.currentTree.waterBonusDays += 0.5;
+        saveState();
+
+        spawnWaterDrops();
+        triggerTreeHappyBounce();
+        updateActionButtons();
+        updateTreeVisuals();
+        renderForestView();
+
+        if (!checkNewlyMatured(prevPct)) {
+            showToast('🌊 成功击退烟瘾！已清零浇水冷却并获赠清泉额度');
+        }
+    }
+
+    // ==================== 8. 导航、书签指引与重设 ====================
+    function switchTab(tabName) {
+        const tabs = ['home', 'forest', 'milestones'];
+        document.getElementById('main-scroll-area').scrollTop = 0;
+
+        tabs.forEach(t => {
+            const panel = document.getElementById(`tab-${t}`);
+            const btn = document.getElementById(`nav-btn-${t}`);
+            if (t === tabName) {
+                panel.classList.remove('hidden');
+                btn.className = 'flex flex-col items-center justify-center gap-1 text-emerald-600 transition flex-1 relative py-1';
+                btn.querySelector('div').className = 'w-8 h-7 rounded-xl bg-emerald-50 flex items-center justify-center';
+                btn.querySelector('span:last-of-type').className = 'text-[11px] font-bold';
+            } else {
+                panel.classList.add('hidden');
+                btn.className = 'flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-600 transition flex-1 relative py-1';
+                btn.querySelector('div').className = 'w-8 h-7 rounded-xl flex items-center justify-center';
+                btn.querySelector('span:last-of-type').className = 'text-[11px] font-medium';
+            }
+        });
+
+        if (tabName === 'forest') renderForestView();
+        if (tabName === 'milestones') renderClinicalTimeline();
+    }
+
+    function openBookmarkTipModal() {
+        document.getElementById('modal-bookmark-tip').classList.remove('hidden');
+    }
+
+    function closeBookmarkTipModal() {
+        document.getElementById('modal-bookmark-tip').classList.add('hidden');
+    }
+
+    function openResetModal() {
+        document.getElementById('modal-reset').classList.remove('hidden');
+    }
+
+    function closeResetModal() {
+        document.getElementById('modal-reset').classList.add('hidden');
+    }
+
+    function confirmResetApp() {
+        closeResetModal();
+        localStorage.removeItem(STORAGE_KEY);
+        appState = null;
+        lastRenderedStageId = null;
+        lastRenderedSpeciesId = null;
+        showOnboardingView();
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast-box');
+        toast.textContent = msg;
+        toast.classList.remove('opacity-0');
+        toast.classList.add('opacity-100');
+        clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => {
+            toast.classList.remove('opacity-100');
+            toast.classList.add('opacity-0');
+        }, 2500);
+    }
+
+    // ==================== 9. 多树种高精矢量 SVG 生成器 ====================
+    function generateTreeSVG(stageId, speciesId = 'birch') {
+        const sp = getSpeciesById(speciesId);
+        const [cDark, cMid, cLight] = sp.crownColors;
+        const animClass = stageId <= 2 ? 'tree-weak' : 'tree-healthy';
+
+        const isDrySoil = stageId === 1;
+        const soilColor = isDrySoil ? '#a89f91' : '#7c583c';
+        const soilHighlight = isDrySoil ? '#c2b8a8' : '#966d4c';
+
+        let skyDeco = '';
+        if (stageId === 1) {
+            skyDeco = `
+                <g opacity="0.55">
+                    <circle cx="75" cy="55" r="18" fill="#cbd5e1"/>
+                    <circle cx="92" cy="52" r="22" fill="#94a3b8"/>
+                    <circle cx="112" cy="56" r="16" fill="#cbd5e1"/>
+                </g>
+            `;
+        } else if (stageId >= 3) {
+            skyDeco = `
+                <g>
+                    <circle cx="245" cy="55" r="24" fill="#fde68a" opacity="0.45"/>
+                    <circle cx="245" cy="55" r="15" fill="#fbbf24"/>
+                    <g class="sun-rays" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round">
+                        <line x1="245" y1="28" x2="245" y2="34"/>
+                        <line x1="245" y1="76" x2="245" y2="82"/>
+                        <line x1="218" y1="55" x2="224" y2="55"/>
+                        <line x1="266" y1="55" x2="272" y2="55"/>
+                        <line x1="226" y1="36" x2="230" y2="40"/>
+                        <line x1="260" y1="70" x2="264" y2="74"/>
+                        <line x1="264" y1="36" x2="260" y2="40"/>
+                        <line x1="230" y1="70" x2="226" y2="74"/>
+                    </g>
+                </g>
+            `;
+        }
+
+        let treeBody = '';
+
+        if (stageId === 1) {
+            treeBody = `
+                <path d="M150 210 Q146 180 158 158 Q165 146 173 142" stroke="#856852" stroke-width="6" stroke-linecap="round" fill="none"/>
+                <path d="M155 175 Q142 168 134 173" stroke="#856852" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                <path d="M173 142 Q188 144 191 158 Q177 156 173 142 Z" fill="#ca8a04"/>
+                <path d="M134 173 Q120 178 122 190 Q133 185 134 173 Z" fill="#b45309"/>
+                <path d="M162 152 Q168 136 180 138 Q174 148 162 152 Z" fill="#d97706"/>
+                <ellipse cx="115" cy="214" rx="7" ry="3.5" transform="rotate(-15 115 214)" fill="#b45309" opacity="0.8"/>
+                <ellipse cx="185" cy="215" rx="6" ry="3" transform="rotate(20 185 215)" fill="#ca8a04" opacity="0.8"/>
+                <path d="M148 186 L152 189 L148 192" stroke="#4a3728" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <path d="M161 186 L157 189 L161 192" stroke="#4a3728" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <path d="M152 197 Q154.5 194 157 197" stroke="#4a3728" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            `;
+        } else if (stageId === 2) {
+            treeBody = `
+                <path d="M150 210 Q148 175 150 142" stroke="${sp.trunkColor}" stroke-width="8" stroke-linecap="round" fill="none"/>
+                <path d="M149 172 Q132 162 125 152" stroke="${sp.trunkColor}" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                <path d="M150 160 Q168 150 175 140" stroke="${sp.trunkColor}" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                <path d="M150 142 Q136 122 150 108 Q164 122 150 142 Z" fill="${cMid}"/>
+                <path d="M125 152 Q106 146 108 132 Q123 135 125 152 Z" fill="${cLight}"/>
+                <path d="M175 140 Q194 134 192 120 Q177 123 175 140 Z" fill="${cMid}"/>
+                <circle cx="146" cy="184" r="1.5" fill="#3e2723"/>
+                <circle cx="154" cy="184" r="1.5" fill="#3e2723"/>
+                <path d="M147 189 Q150 192 153 189" stroke="#3e2723" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            `;
+        } else if (stageId === 3) {
+            treeBody = `
+                <path d="M142 210 Q145 170 146 130 L154 130 Q155 170 158 210 Z" fill="${sp.trunkColor}"/>
+                <path d="M148 165 L125 145" stroke="${sp.trunkColor}" stroke-width="5" stroke-linecap="round"/>
+                <path d="M152 155 L175 138" stroke="${sp.trunkColor}" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="122" cy="135" r="26" fill="${cMid}"/>
+                <circle cx="178" cy="132" r="25" fill="${cDark}"/>
+                <circle cx="150" cy="105" r="34" fill="${cLight}"/>
+                <circle cx="136" cy="118" r="24" fill="${cMid}"/>
+                <circle cx="165" cy="116" r="23" fill="${cLight}"/>
+                <circle cx="145" cy="180" r="1.8" fill="#3e2723"/>
+                <circle cx="155" cy="180" r="1.8" fill="#3e2723"/>
+                <path d="M146 185 Q150 190 154 185" stroke="#3e2723" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            `;
+        } else if (stageId === 4) {
+            treeBody = `
+                <path d="M138 210 Q143 165 144 120 L156 120 Q157 165 162 210 Z" fill="${sp.trunkColor}"/>
+                <path d="M146 160 L118 138" stroke="${sp.trunkColor}" stroke-width="6" stroke-linecap="round"/>
+                <path d="M154 152 L182 132" stroke="${sp.trunkColor}" stroke-width="6" stroke-linecap="round"/>
+                <circle cx="112" cy="132" r="30" fill="${cDark}"/>
+                <circle cx="188" cy="130" r="30" fill="${cDark}"/>
+                <circle cx="128" cy="102" r="32" fill="${cMid}"/>
+                <circle cx="172" cy="102" r="32" fill="${cMid}"/>
+                <circle cx="150" cy="85" r="38" fill="${cLight}"/>
+                <circle cx="150" cy="118" r="30" fill="${cMid}"/>
+                <g fill="${sp.flowerColor}">
+                    <circle cx="118" cy="122" r="4.5"/><circle cx="118" cy="122" r="1.8" fill="#fbbf24"/>
+                    <circle cx="145" cy="76" r="5"/><circle cx="145" cy="76" r="2" fill="#fbbf24"/>
+                    <circle cx="176" cy="96" r="4.5"/><circle cx="176" cy="96" r="1.8" fill="#fbbf24"/>
+                    <circle cx="164" cy="126" r="4.5"/><circle cx="164" cy="126" r="1.8" fill="#fbbf24"/>
+                </g>
+                <g class="butterfly-float" transform="translate(86, 82)">
+                    <path d="M0 0 Q-8 -8 -10 0 Q-8 6 0 2 Z" fill="#f472b6"/>
+                    <path d="M0 0 Q8 -8 10 0 Q8 6 0 2 Z" fill="#fb7185"/>
+                </g>
+                <path d="M142 178 Q145 174 148 178" stroke="#2d1b11" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                <path d="M152 178 Q155 174 158 178" stroke="#2d1b11" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                <path d="M145 184 Q150 191 155 184 Z" fill="#ef4444"/>
+            `;
+        } else {
+            treeBody = `
+                <circle class="aura-glow" cx="150" cy="112" r="78" fill="#fef08a"/>
+                <circle cx="150" cy="112" r="62" fill="${cLight}" opacity="0.35"/>
+                <path d="M132 212 Q141 165 142 115 L158 115 Q159 165 168 212 Z" fill="${sp.trunkColor}"/>
+                <path d="M144 158 L110 132" stroke="${sp.trunkColor}" stroke-width="7" stroke-linecap="round"/>
+                <path d="M156 150 L190 128" stroke="${sp.trunkColor}" stroke-width="7" stroke-linecap="round"/>
+                <circle cx="102" cy="128" r="34" fill="${cDark}"/>
+                <circle cx="198" cy="126" r="34" fill="${cDark}"/>
+                <circle cx="120" cy="94" r="36" fill="${cMid}"/>
+                <circle cx="180" cy="94" r="36" fill="${cMid}"/>
+                <circle cx="150" cy="74" r="42" fill="${cLight}"/>
+                <circle cx="150" cy="112" r="36" fill="${cMid}"/>
+                <g>
+                    <circle cx="112" cy="126" r="6" fill="${sp.fruitColor}"/><circle cx="110" cy="124" r="1.8" fill="#ffffff"/>
+                    <circle cx="142" cy="72" r="6.5" fill="${sp.fruitColor}"/><circle cx="140" cy="70" r="2" fill="#ffffff"/>
+                    <circle cx="182" cy="92" r="6" fill="${sp.fruitColor}"/><circle cx="180" cy="90" r="1.8" fill="#ffffff"/>
+                    <circle cx="168" cy="128" r="6" fill="${sp.fruitColor}"/><circle cx="166" cy="126" r="1.8" fill="#ffffff"/>
+                </g>
+                <g class="butterfly-float" transform="translate(80, 74)">
+                    <path d="M0 0 Q-8 -8 -10 0 Q-8 6 0 2 Z" fill="#38bdf8"/>
+                    <path d="M0 0 Q8 -8 10 0 Q8 6 0 2 Z" fill="#818cf8"/>
+                </g>
+                <g class="butterfly-float" transform="translate(218, 86)">
+                    <path d="M0 0 Q-7 -7 -9 0 Q-7 5 0 2 Z" fill="#fbbf24"/>
+                    <path d="M0 0 Q7 -7 9 0 Q7 5 0 2 Z" fill="#f59e0b"/>
+                </g>
+                <path d="M141 176 Q145 171 149 176" stroke="#2d1b11" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M151 176 Q155 171 159 176" stroke="#2d1b11" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M144 182 Q150 190 156 182 Z" fill="#ef4444"/>
+            `;
+        }
+
+        const soilCracks = isDrySoil
+            ? `<path d="M115 212 L123 218 L119 224 M178 211 L172 217 L177 223" stroke="#6e6559" stroke-width="1.5" fill="none" stroke-linecap="round"/>`
+            : `<path d="M105 210 Q103 202 99 200 M108 210 Q110 201 114 199 M192 210 Q194 201 198 199" stroke="#22c55e" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+
+        return `
+            <svg viewBox="0 0 300 240" class="w-full h-full max-w-[280px] overflow-visible">
+                ${skyDeco}
+                <g class="tree-anim-target ${animClass}" data-base-class="${animClass}">
+                    ${treeBody}
+                </g>
+                <ellipse cx="150" cy="216" rx="76" ry="16" fill="${soilColor}"/>
+                <ellipse cx="150" cy="213" rx="64" ry="11" fill="${soilHighlight}"/>
+                ${soilCracks}
+            </svg>
+        `;
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
 </script>
 </body>
 </html>
